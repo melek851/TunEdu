@@ -49,7 +49,7 @@ export const subjects: Subject[] = [
     slug: 'physique-chimie-bac', 
     description: 'Physique et Chimie pour la section Bac Sciences.', 
     manualUrl: '/sample.pdf',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1574170623305-76d87a783241?q=80&w=600&h=400&fit=crop',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1614926852302-28e866a8a342?q=80&w=600&h=400&fit=crop',
     thumbnailHint: 'atom model'
   },
   { 
