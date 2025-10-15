@@ -1,3 +1,46 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "math-thumb",
+      "description": "Thumbnail for Mathematics subject",
+      "imageUrl": "https://picsum.photos/seed/10/600/400",
+      "imageHint": "abstract math"
+    },
+    {
+      "id": "french-thumb",
+      "description": "Thumbnail for French subject",
+      "imageUrl": "https://picsum.photos/seed/11/600/400",
+      "imageHint": "eiffel tower"
+    },
+    {
+      "id": "arabic-thumb",
+      "description": "Thumbnail for Arabic subject",
+      "imageUrl": "https://picsum.photos/seed/12/600/400",
+      "imageHint": "arabic calligraphy"
+    },
+    {
+      "id": "science-thumb",
+      "description": "Thumbnail for Science subject",
+      "imageUrl": "https://picsum.photos/seed/13/600/400",
+      "imageHint": "science lab"
+    },
+    {
+      "id": "history-thumb",
+      "description": "Thumbnail for History subject",
+      "imageUrl": "https://picsum.photos/seed/14/600/400",
+      "imageHint": "ancient ruins"
+    },
+    {
+      "id": "physics-thumb",
+      "description": "Thumbnail for Physics subject",
+      "imageUrl": "https://picsum.photos/seed/15/600/400",
+      "imageHint": "atom model"
+    },
+    {
+      "id": "info-thumb",
+      "description": "Thumbnail for Informatics subject",
+      "imageUrl": "https://picsum.photos/seed/16/600/400",
+      "imageHint": "circuit board"
+    }
+  ]
 }
