@@ -6,7 +6,7 @@ export const mockUser: User = {
   lastName: 'Cherif',
   email: 'ahmed.cherif@tuned.tn',
   role: 'STUDENT',
-  avatarUrl: 'https://picsum.photos/seed/user-avatar/100/100',
+  avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop',
 };
 
 export const levels: Level[] = [
@@ -39,7 +39,7 @@ export const subjects: Subject[] = [
     slug: 'maths-bac', 
     description: 'Programme complet de mathématiques pour la section Bac Sciences Expérimentales.', 
     manualUrl: '/sample.pdf',
-    thumbnailUrl: 'https://picsum.photos/seed/10/600/400',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=600&h=400&fit=crop',
     thumbnailHint: 'abstract math'
   },
   { 
@@ -49,7 +49,7 @@ export const subjects: Subject[] = [
     slug: 'physique-chimie-bac', 
     description: 'Physique et Chimie pour la section Bac Sciences.', 
     manualUrl: '/sample.pdf',
-    thumbnailUrl: 'https://picsum.photos/seed/15/600/400',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1574170623305-76d87a783241?q=80&w=600&h=400&fit=crop',
     thumbnailHint: 'atom model'
   },
   { 
@@ -59,7 +59,7 @@ export const subjects: Subject[] = [
     slug: 'info-bac', 
     description: 'Algorithmique et programmation pour le Bac.', 
     manualUrl: '/sample.pdf',
-    thumbnailUrl: 'https://picsum.photos/seed/16/600/400',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=600&h=400&fit=crop',
     thumbnailHint: 'circuit board'
   },
   { 
@@ -69,7 +69,7 @@ export const subjects: Subject[] = [
     slug: 'francais-9eme', 
     description: 'Langue et littérature française pour la 9ème année.', 
     manualUrl: '/sample.pdf',
-    thumbnailUrl: 'https://picsum.photos/seed/11/600/400',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=600&h=400&fit=crop',
     thumbnailHint: 'eiffel tower'
   },
   { 
@@ -79,7 +79,7 @@ export const subjects: Subject[] = [
     slug: 'arabe-9eme', 
     description: 'Langue et littérature Arabe pour la 9ème année.', 
     manualUrl: '/sample.pdf',
-    thumbnailUrl: 'https://picsum.photos/seed/12/600/400',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1627490079334-135b9a702a4a?q=80&w=600&h=400&fit=crop',
     thumbnailHint: 'arabic calligraphy'
   },
 ];
@@ -105,7 +105,7 @@ export const exercises: Exercise[] = [
 
 export const comments: Comment[] = [
   { id: 'comment-1', user: mockUser, body: 'Merci beaucoup pour cette explication claire !', createdAt: 'Il y a 2 heures' },
-  { id: 'comment-2', user: { ...mockUser, id: 'user-2', firstName: 'Sarah', lastName: 'Ben Ali', avatarUrl: 'https://picsum.photos/seed/user-2/100/100' }, body: 'Est-ce qu\'on pourrait avoir plus d\'exercices sur les limites ?', createdAt: 'Il y a 1 jour' },
+  { id: 'comment-2', user: { ...mockUser, id: 'user-2', firstName: 'Sarah', lastName: 'Ben Ali', avatarUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100&h=100&fit=crop' }, body: 'Est-ce qu\'on pourrait avoir plus d\'exercices sur les limites ?', createdAt: 'Il y a 1 jour' },
 ];
 
 export const dashboardStats: DashboardStats = {
