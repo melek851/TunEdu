@@ -19,6 +19,9 @@ export const classYears: ClassYear[] = [
   // Primaire
   { id: 'year-1', levelSlug: 'primaire', name: '1ère Année', slug: '1ere-annee-primaire', order: 1 },
   { id: 'year-2', levelSlug: 'primaire', name: '2ème Année', slug: '2eme-annee-primaire', order: 2 },
+  { id: 'year-3', levelSlug: 'primaire', name: '3ème Année', slug: '3eme-annee-primaire', order: 3 },
+  { id: 'year-4', levelSlug: 'primaire', name: '4ème Année', slug: '4eme-annee-primaire', order: 4 },
+  { id: 'year-5', levelSlug: 'primaire', name: '5ème Année', slug: '5eme-annee-primaire', order: 5 },
   { id: 'year-6', levelSlug: 'primaire', name: '6ème Année', slug: '6eme-annee-primaire', order: 6 },
   // Collège
   { id: 'year-7', levelSlug: 'college', name: '7ème Année', slug: '7eme-annee', order: 1 },
@@ -49,8 +52,8 @@ export const subjects: Subject[] = [
     slug: 'physique-chimie-bac', 
     description: 'Physique et Chimie pour la section Bac Sciences.', 
     manualUrl: '/sample.pdf',
-    thumbnailUrl: 'https://images.unsplash.com/photo-1614926852302-28e866a8a342?q=80&w=600&h=400&fit=crop',
-    thumbnailHint: 'atom model'
+    thumbnailUrl: 'https://images.unsplash.com/photo-1574169208507-84376144848b?q=80&w=600&h=400&fit=crop',
+    thumbnailHint: 'abstract physics'
   },
   { 
     id: 'subj-3', 
