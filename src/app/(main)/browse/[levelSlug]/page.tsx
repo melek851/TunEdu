@@ -1,20 +1,21 @@
+
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { levels, classYears } from '@/lib/data';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import type { BreadcrumbItem } from '@/lib/types';
+import { getLevelBySlug, getClassYearsByLevel } from '@/lib/firestore-data';
 
-export default function BrowseYearsPage({ params }: { params: { levelSlug: string } }) {
+export default async function BrowseYearsPage({ params }: { params: { levelSlug: string } }) {
   const { levelSlug } = params;
-  const level = levels.find((l) => l.slug === levelSlug);
+  const level = await getLevelBySlug(levelSlug);
   
   if (!level) {
     notFound();
   }
 
-  const years = classYears.filter((y) => y.levelSlug === levelSlug).sort((a,b) => a.order - b.order);
+  const years = await getClassYearsByLevel(levelSlug);
 
   const breadcrumbItems: BreadcrumbItem[] = [
     { label: 'Parcourir', href: '/browse' },

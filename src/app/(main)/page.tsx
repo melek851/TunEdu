@@ -1,3 +1,4 @@
+
 import { Clock, BookOpen, FileText, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -8,7 +9,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { dashboardStats, subjects } from '@/lib/data';
+import { dashboardStats } from '@/lib/data';
+import { getAllSubjects } from '@/lib/firestore-data';
 import Image from 'next/image';
 
 function formatTime(seconds: number) {
@@ -17,7 +19,9 @@ function formatTime(seconds: number) {
   return `${h > 0 ? `${h}h ` : ''}${m}m`;
 }
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const subjects = await getAllSubjects();
+
   const stats = [
     {
       title: "Temps passé (aujourd'hui)",

@@ -1,25 +1,26 @@
+
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Book, Download, ListVideo, ArrowRight } from 'lucide-react';
-import { subjects, lessons, classYears, levels } from '@/lib/data';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { AiAssistant } from '@/components/ai-assistant';
 import type { BreadcrumbItem } from '@/lib/types';
+import { getSubjectBySlug, getLessonsBySubject, getClassYearBySlug, getLevelBySlug } from '@/lib/firestore-data';
 
-export default function SubjectPage({ params }: { params: { subjectSlug: string } }) {
+export default async function SubjectPage({ params }: { params: { subjectSlug: string } }) {
   const { subjectSlug } = params;
-  const subject = subjects.find((s) => s.slug === subjectSlug);
+  const subject = await getSubjectBySlug(subjectSlug);
 
   if (!subject) {
     notFound();
   }
 
-  const subjectLessons = lessons.filter((l) => l.subjectSlug === subjectSlug).sort((a,b) => a.order - b.order);
-  const year = classYears.find((y) => y.slug === subject.classYearSlug);
-  const level = levels.find((l) => l.slug === year?.levelSlug);
+  const subjectLessons = await getLessonsBySubject(subjectSlug);
+  const year = await getClassYearBySlug(subject.classYearSlug, subject.classYearSlug); // Note: second param is not used in current implementation but good to have
+  const level = year ? await getLevelBySlug(year.levelSlug) : null;
 
   const breadcrumbItems: BreadcrumbItem[] = [
     { label: 'Parcourir', href: '/browse' },

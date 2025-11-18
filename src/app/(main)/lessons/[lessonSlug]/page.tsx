@@ -1,5 +1,5 @@
+
 import { notFound } from 'next/navigation';
-import { lessons, recordedSessions, exercises, subjects, classYears, levels } from '@/lib/data';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import type { BreadcrumbItem } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,20 +10,24 @@ import { VoteWidget } from '@/components/vote-widget';
 import { Comments } from '@/components/comments';
 import { Separator } from '@/components/ui/separator';
 import { AiAssistant } from '@/components/ai-assistant';
+import { getLessonBySlug, getRecordedSessionsByLesson, getExercisesByLesson, getSubjectBySlug, getClassYearBySlug, getLevelBySlug } from '@/lib/firestore-data';
 
-export default function LessonPage({ params }: { params: { lessonSlug: string } }) {
+export default async function LessonPage({ params }: { params: { lessonSlug: string } }) {
   const { lessonSlug } = params;
-  const lesson = lessons.find((l) => l.slug === lessonSlug);
+  const lesson = await getLessonBySlug(lessonSlug);
 
   if (!lesson) {
     notFound();
   }
 
-  const lessonSessions = recordedSessions.filter((s) => s.lessonSlug === lessonSlug);
-  const lessonExercises = exercises.filter((e) => e.lessonSlug === lessonSlug);
-  const subject = subjects.find((s) => s.slug === lesson.subjectSlug);
-  const year = classYears.find((y) => y.slug === subject?.classYearSlug);
-  const level = levels.find((l) => l.slug === year?.levelSlug);
+  const [lessonSessions, lessonExercises, subject] = await Promise.all([
+    getRecordedSessionsByLesson(lessonSlug),
+    getExercisesByLesson(lessonSlug),
+    getSubjectBySlug(lesson.subjectSlug),
+  ]);
+
+  const year = subject ? await getClassYearBySlug(subject.classYearSlug, subject.classYearSlug) : null;
+  const level = year ? await getLevelBySlug(year.levelSlug) : null;
 
   const breadcrumbItems: BreadcrumbItem[] = [
     { label: 'Parcourir', href: '/browse' },
@@ -114,7 +118,7 @@ export default function LessonPage({ params }: { params: { lessonSlug: string } 
                   <CardDescription>Posez vos questions et échangez avec d'autres étudiants.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Comments />
+                  <Comments lessonId={lesson.id} />
                 </CardContent>
               </Card>
             </TabsContent>

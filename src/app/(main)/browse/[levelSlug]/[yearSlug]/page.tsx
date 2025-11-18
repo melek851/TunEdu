@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
@@ -8,20 +9,20 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { levels, classYears, subjects } from '@/lib/data';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import type { BreadcrumbItem } from '@/lib/types';
+import { getLevelBySlug, getClassYearBySlug, getSubjectsByYear } from '@/lib/firestore-data';
 
-export default function BrowseSubjectsPage({ params }: { params: { levelSlug: string, yearSlug: string } }) {
+export default async function BrowseSubjectsPage({ params }: { params: { levelSlug: string, yearSlug: string } }) {
   const { levelSlug, yearSlug } = params;
-  const level = levels.find((l) => l.slug === levelSlug);
-  const year = classYears.find((y) => y.slug === yearSlug && y.levelSlug === levelSlug);
+  const level = await getLevelBySlug(levelSlug);
+  const year = await getClassYearBySlug(levelSlug, yearSlug);
 
   if (!level || !year) {
     notFound();
   }
 
-  const availableSubjects = subjects.filter((s) => s.classYearSlug === yearSlug);
+  const availableSubjects = await getSubjectsByYear(yearSlug);
 
   const breadcrumbItems: BreadcrumbItem[] = [
     { label: 'Parcourir', href: '/browse' },

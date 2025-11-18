@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { School, GraduationCap, Building } from 'lucide-react';
 import {
@@ -6,8 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { levels } from '@/lib/data';
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { getLevels } from '@/lib/firestore-data';
 
 const levelIcons = {
   Primaire: School,
@@ -15,8 +16,9 @@ const levelIcons = {
   Lycée: GraduationCap,
 };
 
-export default function BrowseLevelsPage() {
+export default async function BrowseLevelsPage() {
   const breadcrumbItems = [{ label: 'Parcourir', href: '/browse' }];
+  const levels = await getLevels();
 
   return (
     <div className="container py-8">

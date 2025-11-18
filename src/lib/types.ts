@@ -1,3 +1,6 @@
+
+import type { Timestamp } from "firebase/firestore";
+
 export type User = {
   id: string;
   email: string;
@@ -53,7 +56,7 @@ export type RecordedSession = {
 };
 
 export type Exercise = {
-  id: string;
+  id:string;
   lessonSlug: string;
   title: string;
   description: string;
@@ -63,9 +66,10 @@ export type Exercise = {
 
 export type Comment = {
   id: string;
-  user: User;
+  lessonId: string;
+  user: Partial<User>;
   body: string;
-  createdAt: string;
+  createdAt: Timestamp | string; // Can be a server timestamp or an ISO string
   parentId?: string;
 };
 
