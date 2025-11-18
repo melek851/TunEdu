@@ -166,12 +166,11 @@ export async function getExercisesByLesson(lessonSlug: string): Promise<Exercise
 export async function getCommentsByLesson(lessonId: string): Promise<Comment[]> {
     noStore();
     try {
-        const q = query(collection(db, 'comments'), where('lessonId', '==', lessonId), orderBy('createdAt', 'desc'));
+        const q = query(collection(db, 'comments'), where('lessonId', '==', lessonId));
         const querySnapshot = await getDocs(q);
 
-        return querySnapshot.docs.map(doc => {
+        const comments = querySnapshot.docs.map(doc => {
             const data = doc.data();
-            // Convert Firestore Timestamp to a serializable string (ISO 8601 format)
             const createdAt = data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : data.createdAt;
             return {
                 ...data,
@@ -179,6 +178,9 @@ export async function getCommentsByLesson(lessonId: string): Promise<Comment[]> 
                 createdAt,
             } as Comment;
         });
+        
+        // Sort comments by date in descending order (newest first)
+        return comments.sort((a, b) => new Date(b.createdAt as string).getTime() - new Date(a.createdAt as string).getTime());
     } catch (error) {
         console.error(`Error fetching comments for lesson ${lessonId}: `, error);
         return [];
