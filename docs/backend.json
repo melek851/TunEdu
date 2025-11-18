@@ -1,0 +1,154 @@
+
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Represents a user in the system.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the user." },
+        "email": { "type": "string", "format": "email", "description": "User's email address." },
+        "firstName": { "type": "string", "description": "User's first name." },
+        "lastName": { "type": "string", "description": "User's last name." },
+        "role": { "type": "string", "enum": ["STUDENT", "ADMIN"], "description": "User's role." },
+        "avatarUrl": { "type": "string", "format": "uri", "description": "URL of the user's avatar image." }
+      },
+      "required": ["id", "email", "firstName", "lastName", "role"]
+    },
+    "Level": {
+      "title": "Level",
+      "description": "Represents an educational level (e.g., Primary, Middle School).",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "order": { "type": "number" },
+        "yearCount": { "type": "number" }
+      },
+      "required": ["id", "name", "slug", "order", "yearCount"]
+    },
+    "ClassYear": {
+      "title": "ClassYear",
+      "description": "Represents a specific year within an educational level.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "levelSlug": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "order": { "type": "number" }
+      },
+      "required": ["id", "levelSlug", "name", "slug", "order"]
+    },
+    "Subject": {
+      "title": "Subject",
+      "description": "Represents a school subject.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "classYearSlug": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "description": { "type": "string" },
+        "manualUrl": { "type": "string", "format": "uri" },
+        "thumbnailUrl": { "type": "string", "format": "uri" },
+        "thumbnailHint": { "type": "string" }
+      },
+      "required": ["id", "classYearSlug", "name", "slug", "description"]
+    },
+    "Lesson": {
+      "title": "Lesson",
+      "description": "Represents a single lesson within a subject.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "subjectSlug": { "type": "string" },
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "summary": { "type": "string" },
+        "order": { "type": "number" },
+        "score": { "type": "number" }
+      },
+      "required": ["id", "subjectSlug", "title", "slug", "summary", "order", "score"]
+    },
+    "RecordedSession": {
+      "title": "RecordedSession",
+      "description": "A recorded video session for a lesson.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "lessonSlug": { "type": "string" },
+        "title": { "type": "string" },
+        "videoUrl": { "type": "string", "format": "uri" },
+        "durationSeconds": { "type": "number" }
+      },
+      "required": ["id", "lessonSlug", "title", "videoUrl", "durationSeconds"]
+    },
+    "Exercise": {
+      "title": "Exercise",
+      "description": "An exercise file related to a lesson.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "lessonSlug": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "fileUrl": { "type": "string", "format": "uri" },
+        "difficulty": { "type": "string", "enum": ["EASY", "MEDIUM", "HARD"] }
+      },
+      "required": ["id", "lessonSlug", "title", "description", "fileUrl", "difficulty"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "A user comment on a lesson.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "lessonId": { "type": "string" },
+        "user": { "$ref": "#/backend/entities/User" },
+        "body": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "parentId": { "type": "string" }
+      },
+      "required": ["id", "lessonId", "user", "body", "createdAt"]
+    }
+  },
+  "auth": {
+    "providers": ["email"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/backend/entities/User" },
+      "description": "Stores user profile information."
+    },
+    "/levels/{levelId}": {
+      "schema": { "$ref": "#/backend/entities/Level" },
+      "description": "Stores the educational levels."
+    },
+    "/classYears/{yearId}": {
+      "schema": { "$ref": "#/backend/entities/ClassYear" },
+      "description": "Stores the class years for each level."
+    },
+    "/subjects/{subjectId}": {
+      "schema": { "$ref": "#/backend/entities/Subject" },
+      "description": "Stores the subjects for each class year."
+    },
+    "/lessons/{lessonId}": {
+      "schema": { "$ref": "#/backend/entities/Lesson" },
+      "description": "Stores the lessons for each subject."
+    },
+    "/recordedSessions/{sessionId}": {
+      "schema": { "$ref": "#/backend/entities/RecordedSession" },
+      "description": "Stores recorded video sessions for lessons."
+    },
+    "/exercises/{exerciseId}": {
+      "schema": { "$ref": "#/backend/entities/Exercise" },
+      "description": "Stores exercises for lessons."
+    },
+    "/comments/{commentId}": {
+      "schema": { "$ref": "#/backend/entities/Comment" },
+      "description": "Stores comments for lessons."
+    }
+  }
+}
