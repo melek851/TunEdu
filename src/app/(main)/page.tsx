@@ -1,5 +1,5 @@
 
-import { Clock, BookOpen, FileText, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import {
   Card,
@@ -9,58 +9,16 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { dashboardStats } from '@/lib/data';
 import { getAllSubjects } from '@/lib/firestore-data';
 import Image from 'next/image';
 
-function formatTime(seconds: number) {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  return `${h > 0 ? `${h}h ` : ''}${m}m`;
-}
-
 export default async function DashboardPage() {
   const subjects = await getAllSubjects();
-
-  const stats = [
-    {
-      title: "Temps passé (aujourd'hui)",
-      value: formatTime(dashboardStats.timeTodaySeconds),
-      icon: Clock,
-      color: 'text-sky-500',
-    },
-    {
-      title: "Leçons vues",
-      value: dashboardStats.lessonsViewed,
-      icon: BookOpen,
-      color: 'text-amber-500',
-    },
-    {
-      title: "Exercices ouverts",
-      value: dashboardStats.exercisesOpened,
-      icon: FileText,
-      color: 'text-violet-500',
-    },
-  ];
 
   return (
     <div className="container py-8">
       <h1 className="text-3xl font-bold font-headline mb-2">Tableau de bord</h1>
       <p className="text-muted-foreground mb-8">Bienvenue ! Voici un résumé de votre activité.</p>
-      
-      <div className="grid gap-4 md:grid-cols-3 mb-8">
-        {stats.map((stat, index) => (
-          <Card key={index}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-              <stat.icon className={`h-5 w-5 ${stat.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
       
       <div>
         <h2 className="text-2xl font-bold font-headline mb-4">Continuer à apprendre</h2>
