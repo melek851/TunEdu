@@ -35,14 +35,18 @@ export default function SignupPage() {
   const [state, dispatch] = useActionState(signUp, initialState);
 
   useEffect(() => {
+    // This effect will run when the component mounts and whenever `state.message` changes.
+    // However, the `redirect` in the server action will trigger a full page navigation,
+    // so this component will unmount and the toast might not be visible.
+    // For a better UX, we could handle redirection on the client after showing the toast.
     if (state.message === 'Success') {
       toast({
         title: "Compte créé avec succès!",
         description: "Vous pouvez maintenant vous connecter.",
       });
-      router.push('/auth/login');
+      // The redirect in the action will handle navigation.
     }
-  }, [state, router]);
+  }, [state.message, router]);
 
   return (
     <Card>

@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/firebase/config';
 import { redirect } from 'next/navigation';
+import { aiSubjectAssistant } from '@/ai/flows/ai-subject-assistant';
 
 const SignUpSchema = z
   .object({
@@ -73,4 +74,46 @@ export async function signUp(
   }
 
   redirect('/auth/login');
+}
+
+
+const AskQuestionSchema = z.object({
+  question: z.string().min(10, { message: 'Votre question doit comporter au moins 10 caractères.' }),
+  subjectSlug: z.string(),
+});
+
+export interface AIAssistantFormState {
+    message: string;
+    answer?: string;
+    errors?: {
+        question?: string[];
+    };
+}
+
+
+export async function askQuestion(prevState: AIAssistantFormState, formData: FormData): Promise<AIAssistantFormState> {
+    const validatedFields = AskQuestionSchema.safeParse(
+        Object.fromEntries(formData.entries())
+    );
+
+    if (!validatedFields.success) {
+        return {
+            message: 'Validation failed.',
+            errors: validatedFields.error.flatten().fieldErrors,
+        };
+    }
+
+    const { question, subjectSlug } = validatedFields.data;
+
+    try {
+        const result = await aiSubjectAssistant({ question, subjectSlug });
+        return {
+            message: 'Success',
+            answer: result.answer,
+        };
+    } catch (e: any) {
+        return {
+            message: 'An error occurred with the AI Assistant.',
+        };
+    }
 }
