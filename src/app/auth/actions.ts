@@ -4,7 +4,7 @@
 import { z } from 'zod';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, AuthErrorCodes } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '@/firebase/admin-config'; // Use admin-config for server actions
+import { auth, db } from '@/firebase/config';
 
 const SignUpSchema = z.object({
   firstName: z.string().min(2, { message: 'Le prénom doit comporter au moins 2 caractères.' }),
