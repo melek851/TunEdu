@@ -119,7 +119,10 @@ export async function signIn(
     };
   }
 
-  redirect('/');
+  // On success, return a success message. The client will handle the redirect.
+  return {
+    message: 'Success',
+  };
 }
 
 
