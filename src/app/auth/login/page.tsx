@@ -31,6 +31,13 @@ export default function LoginPage() {
   const initialState: AuthFormState = { message: '', errors: {} };
   const [state, dispatch] = useActionState(signIn, initialState);
 
+   useEffect(() => {
+    if (state.message === 'Success') {
+      // We perform a full page refresh to ensure the auth state is synchronized
+      window.location.assign('/');
+    }
+  }, [state.message]);
+
   return (
     <Card>
       <CardHeader className="items-center text-center">

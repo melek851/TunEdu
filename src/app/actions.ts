@@ -119,7 +119,7 @@ export async function signIn(
     };
   }
 
-  redirect('/');
+   return { message: 'Success' };
 }
 
 
