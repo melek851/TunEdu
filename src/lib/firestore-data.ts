@@ -41,8 +41,7 @@ export async function getClassYearsByLevel(levelSlug: string): Promise<ClassYear
     const q = query(collection(db, 'classYears'), where('levelSlug', '==', levelSlug));
     const querySnapshot = await getDocs(q);
     const classYears = querySnapshot.docs.map(doc => doc.data() as ClassYear);
-    // Firestore doesn't support complex queries with filtering and ordering on different fields without a composite index.
-    // To avoid this, we sort the data on the client-side.
+    // Sort client-side to avoid needing a composite index in Firestore
     return classYears.sort((a, b) => a.order - b.order);
   } catch (error)
  {
@@ -114,8 +113,7 @@ export async function getLessonsBySubject(subjectSlug: string): Promise<Lesson[]
         const q = query(collection(db, 'lessons'), where('subjectSlug', '==', subjectSlug));
         const querySnapshot = await getDocs(q);
         const lessons = querySnapshot.docs.map(doc => doc.data() as Lesson);
-        // Firestore doesn't support complex queries with filtering and ordering on different fields without a composite index.
-        // To avoid this, we sort the data on the client-side.
+        // Sort client-side to avoid needing a composite index in Firestore
         return lessons.sort((a, b) => a.order - b.order);
     } catch (error) {
         console.error(`Error fetching lessons for subject ${subjectSlug}: `, error);
