@@ -3,9 +3,8 @@
 
 import Link from "next/link"
 import { BookOpenCheck, Loader2 } from "lucide-react"
-import { useActionState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useFormStatus } from "react-dom";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -18,38 +17,26 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast";
-import { initiateEmailSignUp, type AuthFormState } from "../actions";
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? <Loader2 className="animate-spin" /> : "Créer un compte"}
-    </Button>
-  );
-}
 
 export default function SignupPage() {
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-  const initialState: AuthFormState = { message: '', success: false };
-  const [state, formAction] = useActionState(initiateEmailSignUp, initialState);
 
-  useEffect(() => {
-    if (state.success) {
-      toast({
-        title: "Succès",
-        description: "Compte créé. Redirection...",
-      });
-      router.push('/');
-    } else if (state.message && state.message !== 'Validation failed.') {
-      toast({
-        title: "Erreur d'inscription",
-        description: state.message,
-        variant: "destructive",
-      });
-    }
-  }, [state, router, toast]);
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    // Mock API call
+    setTimeout(() => {
+        setIsLoading(false);
+        toast({
+            title: "Compte créé (simulation)",
+            description: "Vous pouvez maintenant vous connecter.",
+        });
+        router.push('/auth/login');
+    }, 1500);
+  };
+
 
   return (
     <Card>
@@ -61,33 +48,35 @@ export default function SignupPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={formAction}>
+        <form onSubmit={handleSubmit}>
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="firstName">Prénom</Label>
-                <Input id="firstName" name="firstName" placeholder="Ahmed" required />
+                <Label htmlFor="first-name">Prénom</Label>
+                <Input id="first-name" placeholder="Ahmed" required disabled={isLoading} />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="lastName">Nom</Label>
-                <Input id="lastName" name="lastName" placeholder="Cherif" required />
+                <Label htmlFor="last-name">Nom</Label>
+                <Input id="last-name" placeholder="Cherif" required disabled={isLoading} />
               </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
                 placeholder="ahmed@example.com"
                 required
+                disabled={isLoading}
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Mot de passe</Label>
-              <Input id="password" name="password" type="password" required />
+              <Input id="password" type="password" required disabled={isLoading} />
             </div>
-            <SubmitButton />
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? <Loader2 className="animate-spin" /> : "Créer un compte"}
+            </Button>
           </div>
         </form>
         <div className="mt-4 text-center text-sm">

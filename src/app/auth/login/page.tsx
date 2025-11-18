@@ -3,9 +3,6 @@
 
 import Link from "next/link"
 import { BookOpenCheck, Loader2 } from "lucide-react"
-import { useActionState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useFormStatus } from "react-dom";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -17,39 +14,28 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { initiateEmailSignIn, type AuthFormState } from "../actions";
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? <Loader2 className="animate-spin" /> : "Se connecter"}
-    </Button>
-  );
-}
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-    const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
-    const initialState: AuthFormState = { message: '', success: false };
-    const [state, formAction] = useActionState(initiateEmailSignIn, initialState);
+    const router = useRouter();
 
-    useEffect(() => {
-        if (state.success) {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsLoading(true);
+        // Mock API call
+        setTimeout(() => {
+            setIsLoading(false);
             toast({
-                title: "Succès",
-                description: "Connexion réussie. Redirection...",
+                title: "Connexion réussie (simulation)",
+                description: "Vous allez être redirigé.",
             });
             router.push('/');
-        } else if (state.message && state.message !== 'Validation failed.') {
-            toast({
-                title: "Erreur de connexion",
-                description: state.message,
-                variant: "destructive",
-            });
-        }
-    }, [state, router, toast]);
+        }, 1500);
+    };
 
   return (
     <Card>
@@ -61,16 +47,16 @@ export default function LoginPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={formAction}>
+        <form onSubmit={handleSubmit}>
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
                 placeholder="ahmed@example.com"
                 required
+                disabled={isLoading}
               />
             </div>
             <div className="grid gap-2">
@@ -83,9 +69,11 @@ export default function LoginPage() {
                   Mot de passe oublié?
                 </Link>
               </div>
-              <Input id="password" name="password" type="password" required />
+              <Input id="password" type="password" required disabled={isLoading} />
             </div>
-            <SubmitButton />
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? <Loader2 className="animate-spin" /> : "Se connecter"}
+            </Button>
           </div>
         </form>
         <div className="mt-4 text-center text-sm">
