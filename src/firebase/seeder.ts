@@ -2,7 +2,7 @@
 'use client';
 
 import { writeBatch, doc, DocumentData, getDocs, collection, Timestamp } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { db } from '@/firebase/config';
 import { levels, classYears, subjects, lessons, recordedSessions, exercises, mockUser as user, comments } from '@/lib/data';
 import type { User, Comment } from '@/lib/types';
 
@@ -50,7 +50,8 @@ async function seedUser(db: any, user: User) {
         await batch.commit();
         console.log(`Seeded 1 document into users`);
         return { collectionName: 'users', status: 'SUCCESS', count: 1 };
-    } catch (error: any) {
+    } catch (error: any)
+        {
         console.error(`Error seeding users:`, error);
         return { collectionName: 'users', status: 'ERROR', error: error.message };
     }
@@ -59,7 +60,6 @@ async function seedUser(db: any, user: User) {
 
 export async function seedDatabase() {
     console.log('Starting database seed...');
-    const { db } = initializeFirebase();
     if (!db) {
         throw new Error("Firestore database is not available.");
     }
