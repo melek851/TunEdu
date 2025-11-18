@@ -1,41 +1,47 @@
 
 'use client';
 
-import Link from "next/link"
-import { BookOpenCheck, Loader2 } from "lucide-react"
+import Link from "next/link";
+import { BookOpenCheck, Loader2 } from "lucide-react";
+import { useActionState, useEffect } from "react";
+import { useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { signIn, type AuthFormState } from "@/app/actions";
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" className="w-full" disabled={pending}>
+      {pending ? <Loader2 className="animate-spin" /> : "Se connecter"}
+    </Button>
+  );
+}
 
 export default function LoginPage() {
-    const [isLoading, setIsLoading] = useState(false);
-    const { toast } = useToast();
-    const router = useRouter();
+  const router = useRouter();
+  const initialState: AuthFormIState = { message: '', errors: {} };
+  const [state, dispatch] = useActionState(signIn, initialState);
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setIsLoading(true);
-        // Mock API call
-        setTimeout(() => {
-            setIsLoading(false);
-            toast({
-                title: "Connexion réussie (simulation)",
-                description: "Vous allez être redirigé.",
-            });
-            router.push('/');
-        }, 1500);
-    };
+  useEffect(() => {
+    if (state.message === 'Success') {
+      toast({
+        title: "Connexion réussie!",
+        description: "Vous allez être redirigé vers le tableau de bord.",
+      });
+    }
+  }, [state, router]);
 
   return (
     <Card>
@@ -47,17 +53,25 @@ export default function LoginPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit}>
+        <form action={dispatch}>
           <div className="grid gap-4">
+             {state.errors?._form && (
+              <div className="p-2 bg-destructive/10 text-destructive text-sm rounded-md">
+                {state.errors._form[0]}
+              </div>
+            )}
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="ahmed@example.com"
                 required
-                disabled={isLoading}
               />
+               {state.errors?.email && (
+                <p className="text-sm text-destructive">{state.errors.email[0]}</p>
+              )}
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
@@ -69,11 +83,12 @@ export default function LoginPage() {
                   Mot de passe oublié?
                 </Link>
               </div>
-              <Input id="password" type="password" required disabled={isLoading} />
+              <Input id="password" name="password" type="password" required />
+               {state.errors?.password && (
+                <p className="text-sm text-destructive">{state.errors.password[0]}</p>
+              )}
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? <Loader2 className="animate-spin" /> : "Se connecter"}
-            </Button>
+            <SubmitButton />
           </div>
         </form>
         <div className="mt-4 text-center text-sm">
@@ -84,5 +99,5 @@ export default function LoginPage() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
