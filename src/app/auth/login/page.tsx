@@ -5,7 +5,6 @@ import Link from "next/link";
 import { BookOpenCheck, Loader2 } from "lucide-react";
 import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
-import { toast } from "@/hooks/use-toast";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -31,17 +30,6 @@ function SubmitButton() {
 export default function LoginPage() {
   const initialState: AuthFormState = { message: '', errors: {} };
   const [state, dispatch] = useActionState(signIn, initialState);
-
-  useEffect(() => {
-    if (state.message === 'Success') {
-      toast({
-        title: "Connexion réussie!",
-        description: "Vous allez être redirigé vers le tableau de bord.",
-      });
-      // Force a full page reload to ensure the Firebase auth state is updated on the client.
-      window.location.href = '/';
-    }
-  }, [state]);
 
   return (
     <Card>
