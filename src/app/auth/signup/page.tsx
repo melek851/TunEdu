@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast";
-import { initiateEmailSignUp, type AuthFormState } from "./actions";
+import { initiateEmailSignUp, type AuthFormState } from "../actions";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -42,7 +42,7 @@ export default function SignupPage() {
         description: "Compte créé. Redirection...",
       });
       router.push('/');
-    } else if (state.message) {
+    } else if (state.message && state.message !== 'Validation failed.') {
       toast({
         title: "Erreur d'inscription",
         description: state.message,

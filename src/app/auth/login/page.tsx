@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast";
-import { initiateEmailSignIn, type AuthFormState } from "./actions";
+import { initiateEmailSignIn, type AuthFormState } from "../actions";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -42,7 +42,7 @@ export default function LoginPage() {
                 description: "Connexion réussie. Redirection...",
             });
             router.push('/');
-        } else if (state.message) {
+        } else if (state.message && state.message !== 'Validation failed.') {
             toast({
                 title: "Erreur de connexion",
                 description: state.message,
