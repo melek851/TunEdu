@@ -1,42 +1,48 @@
 
 'use client';
 
-import Link from "next/link"
-import { BookOpenCheck, Loader2 } from "lucide-react"
-import { useState } from "react";
+import Link from "next/link";
+import { BookOpenCheck, Loader2 } from "lucide-react";
+import { useActionState, useEffect } from "react";
+import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast";
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { signUp, type AuthFormState } from "@/app/actions";
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" className="w-full" disabled={pending}>
+      {pending ? <Loader2 className="animate-spin" /> : "Créer un compte"}
+    </Button>
+  );
+}
 
 export default function SignupPage() {
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { toast } = useToast();
+  const initialState: AuthFormState = { message: '', errors: {} };
+  const [state, dispatch] = useActionState(signUp, initialState);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    // Mock API call
-    setTimeout(() => {
-        setIsLoading(false);
-        toast({
-            title: "Compte créé (simulation)",
-            description: "Vous pouvez maintenant vous connecter.",
-        });
-        router.push('/auth/login');
-    }, 1500);
-  };
-
+  useEffect(() => {
+    if (state.message === 'Success') {
+      toast({
+        title: "Compte créé avec succès!",
+        description: "Vous pouvez maintenant vous connecter.",
+      });
+      router.push('/auth/login');
+    }
+  }, [state, router]);
 
   return (
     <Card>
@@ -48,35 +54,50 @@ export default function SignupPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit}>
+        <form action={dispatch}>
           <div className="grid gap-4">
+            {state.errors?._form && (
+              <div className="p-2 bg-destructive/10 text-destructive text-sm rounded-md">
+                {state.errors._form[0]}
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="first-name">Prénom</Label>
-                <Input id="first-name" placeholder="Ahmed" required disabled={isLoading} />
+                <Label htmlFor="firstName">Prénom</Label>
+                <Input id="firstName" name="firstName" placeholder="Ahmed" required />
+                {state.errors?.firstName && (
+                  <p className="text-sm text-destructive">{state.errors.firstName[0]}</p>
+                )}
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="last-name">Nom</Label>
-                <Input id="last-name" placeholder="Cherif" required disabled={isLoading} />
+                <Label htmlFor="lastName">Nom</Label>
+                <Input id="lastName" name="lastName" placeholder="Cherif" required />
+                 {state.errors?.lastName && (
+                  <p className="text-sm text-destructive">{state.errors.lastName[0]}</p>
+                )}
               </div>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="ahmed@example.com"
                 required
-                disabled={isLoading}
               />
+               {state.errors?.email && (
+                <p className="text-sm text-destructive">{state.errors.email[0]}</p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Mot de passe</Label>
-              <Input id="password" type="password" required disabled={isLoading} />
+              <Input id="password" name="password" type="password" required />
+               {state.errors?.password && (
+                <p className="text-sm text-destructive">{state.errors.password[0]}</p>
+              )}
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? <Loader2 className="animate-spin" /> : "Créer un compte"}
-            </Button>
+            <SubmitButton />
           </div>
         </form>
         <div className="mt-4 text-center text-sm">
@@ -87,5 +108,5 @@ export default function SignupPage() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
