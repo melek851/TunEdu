@@ -41,6 +41,8 @@ export async function getClassYearsByLevel(levelSlug: string): Promise<ClassYear
     const q = query(collection(db, 'classYears'), where('levelSlug', '==', levelSlug));
     const querySnapshot = await getDocs(q);
     const classYears = querySnapshot.docs.map(doc => doc.data() as ClassYear);
+    // Firestore doesn't support complex queries with filtering and ordering on different fields without a composite index.
+    // To avoid this, we sort the data on the client-side.
     return classYears.sort((a, b) => a.order - b.order);
   } catch (error)
  {
@@ -109,9 +111,12 @@ export async function getAllSubjects(): Promise<Subject[]> {
 export async function getLessonsBySubject(subjectSlug: string): Promise<Lesson[]> {
     noStore();
     try {
-        const q = query(collection(db, 'lessons'), where('subjectSlug', '==', subjectSlug), orderBy('order'));
+        const q = query(collection(db, 'lessons'), where('subjectSlug', '==', subjectSlug));
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => doc.data() as Lesson);
+        const lessons = querySnapshot.docs.map(doc => doc.data() as Lesson);
+        // Firestore doesn't support complex queries with filtering and ordering on different fields without a composite index.
+        // To avoid this, we sort the data on the client-side.
+        return lessons.sort((a, b) => a.order - b.order);
     } catch (error) {
         console.error(`Error fetching lessons for subject ${subjectSlug}: `, error);
         return [];
@@ -159,37 +164,39 @@ export async function getExercisesByLesson(lessonSlug: string): Promise<Exercise
 }
 
 export async function getCommentsByLesson(lessonId: string): Promise<Comment[]> {
-  noStore();
-  try {
-    const q = query(collection(db, 'comments'), where('lessonId', '==', lessonId), orderBy('createdAt', 'desc'));
-    const querySnapshot = await getDocs(q);
-    const comments = querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      // Firestore Timestamps need to be converted to a serializable format for client components.
-      const createdAt = data.createdAt as Timestamp;
-      return {
-        ...data,
-        createdAt: createdAt.toDate().toISOString(),
-      } as Comment;
-    });
-    return comments;
-  } catch (error) {
-    console.error(`Error fetching comments for lesson ${lessonId}: `, error);
-    return [];
-  }
+    noStore();
+    try {
+        const q = query(collection(db, 'comments'), where('lessonId', '==', lessonId), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            // Convert Firestore Timestamp to a serializable string (ISO 8601 format)
+            const createdAt = data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : data.createdAt;
+            return {
+                ...data,
+                id: doc.id,
+                createdAt,
+            } as Comment;
+        });
+    } catch (error) {
+        console.error(`Error fetching comments for lesson ${lessonId}: `, error);
+        return [];
+    }
 }
 
 export async function getUserProfile(userId: string): Promise<User | null> {
-  noStore();
-  try {
-    const userRef = doc(db, 'users', userId);
-    const userSnap = await getDoc(userRef);
-    if (!userSnap.exists()) {
-      return null;
+    noStore();
+    try {
+        const userDocRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+            return userDoc.data() as User;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error(`Error fetching user profile for user ${userId}: `, error);
+        return null;
     }
-    return userSnap.data() as User;
-  } catch (error) {
-    console.error(`Error fetching user profile ${userId}: `, error);
-    return null;
-  }
 }
