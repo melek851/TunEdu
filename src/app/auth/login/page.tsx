@@ -3,8 +3,10 @@
 
 import Link from "next/link";
 import { BookOpenCheck, Loader2 } from "lucide-react";
-import { useActionState, useEffect } from "react";
-import { useFormStatus } from "react-dom";
+import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase/config";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,27 +18,31 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signIn, type AuthFormState } from "@/app/actions";
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? <Loader2 className="animate-spin" /> : "Se connecter"}
-    </Button>
-  );
-}
 
 export default function LoginPage() {
-  const initialState: AuthFormState = { message: '', errors: {} };
-  const [state, dispatch] = useActionState(signIn, initialState);
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-   useEffect(() => {
-    if (state.message === 'Success') {
-      // We perform a full page refresh to ensure the auth state is synchronized
-      window.location.assign('/');
+  const handleSignIn = async (event: FormEvent) => {
+    event.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push('/');
+    } catch (e: any) {
+      if (e.code === 'auth/invalid-credential') {
+        setError('Email ou mot de passe incorrect.');
+      } else {
+        setError('Une erreur inattendue s\'est produite. Veuillez réessayer.');
+      }
+      setIsLoading(false);
     }
-  }, [state.message]);
+  };
 
   return (
     <Card>
@@ -48,11 +54,11 @@ export default function LoginPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={dispatch}>
+        <form onSubmit={handleSignIn}>
           <div className="grid gap-4">
-             {state.errors?._form && (
+             {error && (
               <div className="p-2 bg-destructive/10 text-destructive text-sm rounded-md">
-                {state.errors._form[0]}
+                {error}
               </div>
             )}
             <div className="grid gap-2">
@@ -63,10 +69,10 @@ export default function LoginPage() {
                 type="email"
                 placeholder="ahmed@example.com"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
               />
-               {state.errors?.email && (
-                <p className="text-sm text-destructive">{state.errors.email[0]}</p>
-              )}
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
@@ -78,12 +84,19 @@ export default function LoginPage() {
                   Mot de passe oublié?
                 </Link>
               </div>
-              <Input id="password" name="password" type="password" required />
-               {state.errors?.password && (
-                <p className="text-sm text-destructive">{state.errors.password[0]}</p>
-              )}
+              <Input 
+                id="password" 
+                name="password" 
+                type="password" 
+                required 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+              />
             </div>
-            <SubmitButton />
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? <Loader2 className="animate-spin" /> : "Se connecter"}
+            </Button>
           </div>
         </form>
         <div className="mt-4 text-center text-sm">

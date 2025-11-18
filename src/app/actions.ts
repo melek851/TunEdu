@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/firebase/config';
 import { redirect } from 'next/navigation';
@@ -14,11 +14,6 @@ const SignUpSchema = z
     email: z.string().email({ message: 'Veuillez saisir une adresse e-mail valide' }),
     password: z.string().min(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' }),
   });
-
-const SignInSchema = z.object({
-  email: z.string().email({ message: 'Veuillez saisir une adresse e-mail valide' }),
-  password: z.string().min(1, { message: 'Le mot de passe est requis' }),
-});
 
 export interface AuthFormState {
   message: string;
@@ -80,48 +75,6 @@ export async function signUp(
 
   redirect('/auth/login');
 }
-
-export async function signIn(
-  prevState: AuthFormState,
-  formData: FormData
-): Promise<AuthFormState> {
-  const validatedFields = SignInSchema.safeParse(
-    Object.fromEntries(formData.entries())
-  );
-
-  if (!validatedFields.success) {
-    return {
-      message: 'Validation failed.',
-      errors: validatedFields.error.flatten().fieldErrors,
-    };
-  }
-
-  const { email, password } = validatedFields.data;
-
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (e: any) {
-    // Firebase auth/invalid-credential for wrong password or non-existent email
-    if (e.code === 'auth/invalid-credential') {
-      return {
-        message: 'Authentication failed.',
-        errors: {
-          _form: ['Email ou mot de passe incorrect.'],
-        },
-      };
-    }
-    // Handle other potential errors
-    return {
-      message: 'An unexpected error occurred.',
-      errors: {
-        _form: ['Une erreur inattendue s\'est produite. Veuillez réessayer.'],
-      },
-    };
-  }
-
-   return { message: 'Success' };
-}
-
 
 const AskQuestionSchema = z.object({
   question: z.string().min(10, { message: 'Votre question doit comporter au moins 10 caractères.' }),
