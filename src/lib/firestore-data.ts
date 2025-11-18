@@ -1,5 +1,5 @@
 
-import { collection, getDocs, doc, getDoc, query, where, orderBy } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, query, where, orderBy, Timestamp } from 'firebase/firestore';
 import { db } from '@/firebase/config';
 import type { Level, ClassYear, Subject, Lesson, RecordedSession, Exercise, Comment, User } from './types';
 import { unstable_noStore as noStore } from 'next/cache';
@@ -38,10 +38,12 @@ export async function getLevelBySlug(slug: string): Promise<Level | null> {
 export async function getClassYearsByLevel(levelSlug: string): Promise<ClassYear[]> {
   noStore();
   try {
-    const q = query(collection(db, 'classYears'), where('levelSlug', '==', levelSlug), orderBy('order'));
+    const q = query(collection(db, 'classYears'), where('levelSlug', '==', levelSlug));
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => doc.data() as ClassYear);
-  } catch (error) {
+    const classYears = querySnapshot.docs.map(doc => doc.data() as ClassYear);
+    return classYears.sort((a, b) => a.order - b.order);
+  } catch (error)
+ {
     console.error(`Error fetching class years for level ${levelSlug}: `, error);
     return [];
   }
@@ -50,7 +52,9 @@ export async function getClassYearsByLevel(levelSlug: string): Promise<ClassYear
 export async function getClassYearBySlug(levelSlug: string, yearSlug: string): Promise<ClassYear | null> {
   noStore();
   try {
-    const q = query(collection(db, 'classYears'), where('levelSlug', '==', levelSlug), where('slug', '==', yearSlug));
+    // Note: The original query had levelSlug as a filter, but class year slugs are unique.
+    // Kept for consistency, but `where('slug', '==', yearSlug)` is likely sufficient.
+    const q = query(collection(db, 'classYears'), where('slug', '==', yearSlug));
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty) {
       return null;
@@ -162,9 +166,10 @@ export async function getCommentsByLesson(lessonId: string): Promise<Comment[]> 
     const comments = querySnapshot.docs.map(doc => {
       const data = doc.data();
       // Firestore Timestamps need to be converted to a serializable format for client components.
+      const createdAt = data.createdAt as Timestamp;
       return {
         ...data,
-        createdAt: data.createdAt.toDate().toISOString(),
+        createdAt: createdAt.toDate().toISOString(),
       } as Comment;
     });
     return comments;

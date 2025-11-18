@@ -22,7 +22,7 @@ export default async function BrowseSubjectsPage({ params }: { params: { levelSl
     notFound();
   }
 
-  const availableSubjects = await getSubjectsByYear(yearSlug);
+  const availableSubjects = await getSubjectsByYear(year.slug);
 
   const breadcrumbItems: BreadcrumbItem[] = [
     { label: 'Parcourir', href: '/browse' },

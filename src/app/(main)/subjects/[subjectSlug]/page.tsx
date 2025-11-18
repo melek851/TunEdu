@@ -19,14 +19,14 @@ export default async function SubjectPage({ params }: { params: { subjectSlug: s
   }
 
   const subjectLessons = await getLessonsBySubject(subjectSlug);
-  const year = await getClassYearBySlug(subject.classYearSlug, subject.classYearSlug); // Note: second param is not used in current implementation but good to have
+  const year = await getClassYearBySlug(subject.classYearSlug, subject.classYearSlug);
   const level = year ? await getLevelBySlug(year.levelSlug) : null;
 
   const breadcrumbItems: BreadcrumbItem[] = [
     { label: 'Parcourir', href: '/browse' },
   ];
   if(level) breadcrumbItems.push({ label: level.name, href: `/browse/${level.slug}` });
-  if(year) breadcrumbItems.push({ label: year.name, href: `/browse/${level?.slug}/${year.slug}` });
+  if(year && level) breadcrumbItems.push({ label: year.name, href: `/browse/${level.slug}/${year.slug}` });
   breadcrumbItems.push({ label: subject.name, href: `/subjects/${subject.slug}` });
 
 

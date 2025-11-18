@@ -33,7 +33,7 @@ export default async function LessonPage({ params }: { params: { lessonSlug: str
     { label: 'Parcourir', href: '/browse' },
   ];
   if(level) breadcrumbItems.push({ label: level.name, href: `/browse/${level.slug}` });
-  if(year) breadcrumbItems.push({ label: year.name, href: `/browse/${level?.slug}/${year.slug}` });
+  if(year && level) breadcrumbItems.push({ label: year.name, href: `/browse/${level.slug}/${year.slug}` });
   if(subject) breadcrumbItems.push({ label: subject.name, href: `/subjects/${subject.slug}` });
   breadcrumbItems.push({ label: lesson.title, href: `/lessons/${lesson.slug}` });
 
