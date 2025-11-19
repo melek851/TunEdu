@@ -272,7 +272,7 @@ export async function getUserDashboardStats(userId: string): Promise<DashboardSt
         const [lessonsSnapshot, exercisesSnapshot, timeSnapshot] = await Promise.all([
             getDocs(lessonsQuery),
             getDocs(exercisesQuery),
-            getDocs(timeSnapshot)
+            getDocs(timeQuery)
         ]);
 
         const totalTimeToday = timeSnapshot.docs
