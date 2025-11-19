@@ -19,7 +19,7 @@ export default async function SubjectPage({ params }: { params: { subjectSlug: s
   }
 
   const subjectLessons = await getLessonsBySubject(subjectSlug);
-  const year = await getClassYearBySlug(subject.classYearSlug, subject.classYearSlug);
+  const year = await getClassYearBySlug(subject.classYearSlug);
   const level = year ? await getLevelBySlug(year.levelSlug) : null;
 
   const breadcrumbItems: BreadcrumbItem[] = [
