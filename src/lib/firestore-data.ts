@@ -50,23 +50,21 @@ export async function getClassYearsByLevel(levelSlug: string): Promise<ClassYear
   }
 }
 
-export async function getClassYearBySlug(yearSlug: string): Promise<ClassYear | null> {
+export async function getClassYearBySlug(levelSlug: string, yearSlug: string): Promise<ClassYear | null> {
     noStore();
-    if (!yearSlug) return null;
+    if (!yearSlug || !levelSlug) return null;
     try {
-        const q = query(collection(db, 'classYears'), where('slug', '==', yearSlug));
+        const q = query(collection(db, 'classYears'), where('levelSlug', '==', levelSlug), where('slug', '==', yearSlug));
         const querySnapshot = await getDocs(q);
         if (querySnapshot.empty) {
-            // Fallback for combined slugs like '1ere-annee-secondaire' vs '1ere-annee'
-            const genericSlug = yearSlug.split('-').slice(0, 2).join('-');
-            const fallbackQuery = query(collection(db, 'classYears'), where('slug', '==', genericSlug));
+             const fallbackQuery = query(collection(db, 'classYears'), where('slug', '==', yearSlug));
             const fallbackSnapshot = await getDocs(fallbackQuery);
             if(fallbackSnapshot.empty) return null;
             return fallbackSnapshot.docs[0].data() as ClassYear;
         }
         return querySnapshot.docs[0].data() as ClassYear;
     } catch (error) {
-        console.error(`Error fetching class year by slug ${yearSlug}: `, error);
+        console.error(`Error fetching class year by slug ${yearSlug} for level ${levelSlug}: `, error);
         return null;
     }
 }
