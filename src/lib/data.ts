@@ -35,7 +35,7 @@ export const subjects: Subject[] = [
     slug: 'math-bac',
     description: "Analyse, algèbre, probabilités et géométrie pour préparer le baccalauréat.",
     manualUrl: '/manuals/manual_math_bac.pdf',
-    thumbnailUrl: '/images/math.jpeg',
+    thumbnailUrl: 'https://picsum.photos/seed/10/600/400',
     thumbnailHint: 'abstract math'
   },
   {
@@ -45,7 +45,7 @@ export const subjects: Subject[] = [
     slug: 'physique-chimie-bac',
     description: "Mécanique, électricité, chimie organique et inorganique pour le niveau terminal.",
     manualUrl: '/manuals/manual_physique_bac.pdf',
-    thumbnailUrl: '/images/physics.jpeg',
+    thumbnailUrl: 'https://picsum.photos/seed/15/600/400',
     thumbnailHint: 'science lab'
   },
   {
@@ -55,7 +55,7 @@ export const subjects: Subject[] = [
     slug: 'informatique-bac',
     description: "Algorithmique, structures de données, bases de données et programmation.",
     manualUrl: '/manuals/manual_info_bac.pdf',
-    thumbnailUrl: '/images/cs.jpeg',
+    thumbnailUrl: 'https://picsum.photos/seed/16/600/400',
     thumbnailHint: 'circuit board'
   },
   {
