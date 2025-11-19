@@ -57,7 +57,12 @@ export async function getClassYearBySlug(yearSlug: string): Promise<ClassYear | 
         const q = query(collection(db, 'classYears'), where('slug', '==', yearSlug));
         const querySnapshot = await getDocs(q);
         if (querySnapshot.empty) {
-            return null;
+            // Fallback for combined slugs like '1ere-annee-secondaire' vs '1ere-annee'
+            const genericSlug = yearSlug.split('-').slice(0, 2).join('-');
+            const fallbackQuery = query(collection(db, 'classYears'), where('slug', '==', genericSlug));
+            const fallbackSnapshot = await getDocs(fallbackQuery);
+            if(fallbackSnapshot.empty) return null;
+            return fallbackSnapshot.docs[0].data() as ClassYear;
         }
         return querySnapshot.docs[0].data() as ClassYear;
     } catch (error) {
@@ -267,12 +272,13 @@ export async function getUserDashboardStats(userId: string): Promise<DashboardSt
         const [lessonsSnapshot, exercisesSnapshot, timeSnapshot] = await Promise.all([
             getDocs(lessonsQuery),
             getDocs(exercisesQuery),
-            getDocs(timeQuery)
+            getDocs(timeSnapshot)
         ]);
 
         const totalTimeToday = timeSnapshot.docs
             .map(doc => doc.data())
             .filter(data => {
+                if (!data.loggedAt) return false;
                 const loggedAtDate = (data.loggedAt as Timestamp).toDate();
                 return loggedAtDate >= today;
             })
