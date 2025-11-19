@@ -86,7 +86,7 @@ export default function LessonPage({ params }: { params: { lessonSlug: string } 
             setSubject(subjectData);
 
             if (subjectData) {
-                const yearData = await getClassYearBySlug(subjectData.classYearSlug, subjectData.classYearSlug);
+                const yearData = await getClassYearBySlug(subjectData.classYearSlug);
                 setYear(yearData);
                 if (yearData) {
                     const levelData = await getLevelBySlug(yearData.levelSlug);
