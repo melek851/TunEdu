@@ -19,8 +19,18 @@ import { useUser } from '@/firebase/auth/use-user';
 
 const convertToEmbedUrl = (url: string) => {
     if (!url) return '';
+    // Check for standard watch URL
     if (url.includes('youtube.com/watch?v=')) {
         const videoId = url.split('v=')[1].split('&')[0];
+        return `https://www.youtube.com/embed/${videoId}`;
+    }
+    // Check if it's already an embed URL
+    if (url.includes('youtube.com/embed/')) {
+        return url;
+    }
+    // Check for short URL
+    if (url.includes('youtu.be/')) {
+        const videoId = url.split('youtu.be/')[1].split('?')[0];
         return `https://www.youtube.com/embed/${videoId}`;
     }
     return url;
@@ -55,7 +65,6 @@ function ExercisesTab({ exercises, onExerciseOpen }: { exercises: Exercise[], on
 }
 
 export default function LessonPage({ params }: { params: { lessonSlug: string } }) {
-  const { lessonSlug } = params;
   const { user } = useUser();
   
   const [lesson, setLesson] = useState<Lesson | null>(null);
@@ -68,7 +77,9 @@ export default function LessonPage({ params }: { params: { lessonSlug: string } 
 
   useEffect(() => {
     async function fetchData() {
+        const lessonSlug = params.lessonSlug;
         if (!lessonSlug) return;
+
         setLoading(true);
 
         const lessonData = await getLessonBySlug(lessonSlug);
@@ -97,7 +108,7 @@ export default function LessonPage({ params }: { params: { lessonSlug: string } 
         setLoading(false);
     }
     fetchData();
-  }, [lessonSlug]);
+  }, [params.lessonSlug]);
 
   useEffect(() => {
     if (user && lesson) {
