@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/firebase/config';
 import { redirect } from 'next/navigation';
 import { aiSubjectAssistant } from '@/ai/flows/ai-subject-assistant';
@@ -115,4 +115,34 @@ export async function askQuestion(prevState: AIAssistantFormState, formData: For
             message: 'An error occurred with the AI Assistant.',
         };
     }
+}
+
+const LogTimeSpentSchema = z.object({
+  userId: z.string(),
+  durationSeconds: z.number().int().positive(),
+  context: z.string(),
+});
+
+export async function logTimeSpent(formData: FormData) {
+  const validatedFields = LogTimeSpentSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
+  
+  if (!validatedFields.success) {
+    console.error("Invalid time spent data:", validatedFields.error.flatten().fieldErrors);
+    return;
+  }
+
+  const { userId, durationSeconds, context } = validatedFields.data;
+
+  try {
+    await addDoc(collection(db, 'userTimeSpents'), {
+      userId,
+      durationSeconds,
+      context,
+      loggedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error("Error logging time spent:", error);
+  }
 }

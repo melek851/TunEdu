@@ -50,7 +50,7 @@ export async function getClassYearsByLevel(levelSlug: string): Promise<ClassYear
   }
 }
 
-export async function getClassYearBySlug(levelSlug: string, yearSlug: string): Promise<ClassYear | null> {
+export async function getClassYearBySlug(yearSlug: string): Promise<ClassYear | null> {
     noStore();
     if (!yearSlug) return null;
     try {
@@ -253,18 +253,30 @@ export async function getUserDashboardStats(userId: string): Promise<DashboardSt
     if (!userId) return defaultStats;
 
     try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayTimestamp = Timestamp.fromDate(today);
+
         const lessonsQuery = query(collection(db, 'userLessonViews'), where('userId', '==', userId));
         const exercisesQuery = query(collection(db, 'userExerciseOpens'), where('userId', '==', userId));
+        const timeQuery = query(
+            collection(db, 'userTimeSpents'), 
+            where('userId', '==', userId),
+            where('loggedAt', '>=', todayTimestamp)
+        );
 
-        const [lessonsSnapshot, exercisesSnapshot] = await Promise.all([
+        const [lessonsSnapshot, exercisesSnapshot, timeSnapshot] = await Promise.all([
             getDocs(lessonsQuery),
-            getDocs(exercisesQuery)
+            getDocs(exercisesQuery),
+            getDocs(timeQuery)
         ]);
+
+        const totalTimeToday = timeSnapshot.docs.reduce((sum, doc) => sum + doc.data().durationSeconds, 0);
 
         return {
             lessonsViewed: lessonsSnapshot.size,
             exercisesOpened: exercisesSnapshot.size,
-            timeTodaySeconds: 0, // Not implemented yet
+            timeTodaySeconds: totalTimeToday,
         };
 
     } catch (error) {

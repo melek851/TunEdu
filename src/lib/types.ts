@@ -95,3 +95,10 @@ export type UserExerciseOpen = {
   exerciseId: string;
   openedAt: Timestamp;
 };
+
+export type UserTimeSpent = {
+  userId: string;
+  durationSeconds: number;
+  context: string; // e.g., 'lesson:fonctions-log'
+  loggedAt: Timestamp;
+};

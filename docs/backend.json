@@ -134,6 +134,18 @@
         "openedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "exerciseId", "openedAt"]
+    },
+    "UserTimeSpent": {
+      "title": "UserTimeSpent",
+      "description": "Tracks user active time on the platform.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "durationSeconds": { "type": "number" },
+        "context": { "type": "string" },
+        "loggedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "durationSeconds", "context", "loggedAt"]
     }
   },
   "auth": {
@@ -179,6 +191,10 @@
     "/userExerciseOpens/{openId}": {
       "schema": { "$ref": "#/backend/entities/UserExerciseOpen" },
       "description": "Tracks user exercise opens."
+    },
+    "/userTimeSpents/{timeId}": {
+      "schema": { "$ref": "#/backend/entities/UserTimeSpent" },
+      "description": "Stores user time spent records."
     }
   }
 }

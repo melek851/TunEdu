@@ -1,4 +1,3 @@
-
 'use client'
 
 import { notFound, useParams } from 'next/navigation';
@@ -15,6 +14,7 @@ import { AiAssistant } from '@/components/ai-assistant';
 import { getLessonBySlug, getRecordedSessionsByLesson, getExercisesByLesson, getSubjectBySlug, getClassYearBySlug, getLevelBySlug, trackUserLessonView, trackUserExerciseOpen } from '@/lib/firestore-data';
 import { useEffect, useState } from 'react';
 import { useUser } from '@/firebase/auth/use-user';
+import { TimeTracker } from '@/components/time-tracker';
 
 
 const convertToEmbedUrl = (url: string) => {
@@ -142,6 +142,7 @@ export default function LessonPage() {
 
   return (
     <div className="container py-8">
+      {user && <TimeTracker userId={user.uid} context={`lesson:${lesson.slug}`} />}
       <Breadcrumbs items={breadcrumbItems} />
       
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
