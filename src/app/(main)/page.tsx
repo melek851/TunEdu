@@ -52,6 +52,9 @@ export default function DashboardPage() {
       if (user) {
         const userStats = await getUserDashboardStats(user.uid);
         setStats(userStats);
+      } else {
+        // If user logs out, clear the stats
+        setStats(null);
       }
       setLoading(false);
     }
