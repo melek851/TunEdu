@@ -255,14 +255,13 @@ export async function getUserDashboardStats(userId: string): Promise<DashboardSt
     try {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const todayTimestamp = Timestamp.fromDate(today);
-
+        
         const lessonsQuery = query(collection(db, 'userLessonViews'), where('userId', '==', userId));
         const exercisesQuery = query(collection(db, 'userExerciseOpens'), where('userId', '==', userId));
+        // Query only by userId to avoid needing a composite index. We'll filter by date in the code.
         const timeQuery = query(
             collection(db, 'userTimeSpents'), 
-            where('userId', '==', userId),
-            where('loggedAt', '>=', todayTimestamp)
+            where('userId', '==', userId)
         );
 
         const [lessonsSnapshot, exercisesSnapshot, timeSnapshot] = await Promise.all([
@@ -271,7 +270,13 @@ export async function getUserDashboardStats(userId: string): Promise<DashboardSt
             getDocs(timeQuery)
         ]);
 
-        const totalTimeToday = timeSnapshot.docs.reduce((sum, doc) => sum + doc.data().durationSeconds, 0);
+        const totalTimeToday = timeSnapshot.docs
+            .map(doc => doc.data())
+            .filter(data => {
+                const loggedAtDate = (data.loggedAt as Timestamp).toDate();
+                return loggedAtDate >= today;
+            })
+            .reduce((sum, data) => sum + data.durationSeconds, 0);
 
         return {
             lessonsViewed: lessonsSnapshot.size,
