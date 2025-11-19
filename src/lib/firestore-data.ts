@@ -1,5 +1,5 @@
 
-import { collection, getDocs, doc, getDoc, query, where, orderBy, Timestamp, collectionGroup,getCountFromServer } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, query, where, orderBy, Timestamp, collectionGroup, getCountFromServer, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/firebase/config';
 import type { Level, ClassYear, Subject, Lesson, RecordedSession, Exercise, Comment, User, DashboardStats } from './types';
 import { unstable_noStore as noStore } from 'next/cache';
