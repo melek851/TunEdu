@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { logTimeSpent } from '@/app/actions';
 
 export function TimeTracker({ userId, context }: { userId: string; context: string }) {
   const timeSpentRef = useRef(0);
@@ -28,12 +27,10 @@ export function TimeTracker({ userId, context }: { userId: string; context: stri
       formData.append('durationSeconds', String(timeSpentRef.current));
       formData.append('context', context);
       
-      // Use navigator.sendBeacon if available, for reliability on unload
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon('/api/log-time', formData);
-      } else {
-        logTimeSpent(formData);
-      }
+      // Use navigator.sendBeacon for reliability on page unload.
+      // This sends a POST request to the specified API route.
+      navigator.sendBeacon('/api/log-time', formData);
+      
       timeSpentRef.current = 0;
     }
   };
