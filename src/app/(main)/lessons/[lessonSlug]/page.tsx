@@ -1,7 +1,7 @@
 
 'use client'
 
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import type { BreadcrumbItem, Exercise, Lesson, RecordedSession, Subject as SubjectType, ClassYear as ClassYearType, Level as LevelType } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -64,7 +64,9 @@ function ExercisesTab({ exercises, onExerciseOpen }: { exercises: Exercise[], on
     );
 }
 
-export default function LessonPage({ params }: { params: { lessonSlug: string } }) {
+export default function LessonPage() {
+  const params = useParams();
+  const lessonSlug = params.lessonSlug as string;
   const { user } = useUser();
   
   const [lesson, setLesson] = useState<Lesson | null>(null);
@@ -77,15 +79,14 @@ export default function LessonPage({ params }: { params: { lessonSlug: string } 
 
   useEffect(() => {
     async function fetchData() {
-        const lessonSlug = params.lessonSlug;
         if (!lessonSlug) return;
 
         setLoading(true);
 
         const lessonData = await getLessonBySlug(lessonSlug);
-        setLesson(lessonData);
-
+        
         if (lessonData) {
+            setLesson(lessonData);
             const [sessionsData, exercisesData, subjectData] = await Promise.all([
                 getRecordedSessionsByLesson(lessonSlug),
                 getExercisesByLesson(lessonSlug),
@@ -94,12 +95,12 @@ export default function LessonPage({ params }: { params: { lessonSlug: string } 
 
             setLessonSessions(sessionsData);
             setLessonExercises(exercisesData);
-            setSubject(subjectData);
-
+            
             if (subjectData) {
+                setSubject(subjectData);
                 const yearData = await getClassYearBySlug(subjectData.classYearSlug);
-                setYear(yearData);
                 if (yearData) {
+                    setYear(yearData);
                     const levelData = await getLevelBySlug(yearData.levelSlug);
                     setLevel(levelData);
                 }
@@ -108,7 +109,7 @@ export default function LessonPage({ params }: { params: { lessonSlug: string } 
         setLoading(false);
     }
     fetchData();
-  }, [params.lessonSlug]);
+  }, [lessonSlug]);
 
   useEffect(() => {
     if (user && lesson) {
@@ -214,3 +215,5 @@ export default function LessonPage({ params }: { params: { lessonSlug: string } 
     </div>
   );
 }
+
+    
