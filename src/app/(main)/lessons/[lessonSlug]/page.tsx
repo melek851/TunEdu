@@ -1,7 +1,9 @@
 
+'use client'
+
 import { notFound } from 'next/navigation';
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import type { BreadcrumbItem } from '@/lib/types';
+import type { BreadcrumbItem, Exercise, Lesson, RecordedSession, Subject as SubjectType, ClassYear as ClassYearType, Level as LevelType } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,24 +12,113 @@ import { VoteWidget } from '@/components/vote-widget';
 import { Comments } from '@/components/comments';
 import { Separator } from '@/components/ui/separator';
 import { AiAssistant } from '@/components/ai-assistant';
-import { getLessonBySlug, getRecordedSessionsByLesson, getExercisesByLesson, getSubjectBySlug, getClassYearBySlug, getLevelBySlug } from '@/lib/firestore-data';
+import { getLessonBySlug, getRecordedSessionsByLesson, getExercisesByLesson, getSubjectBySlug, getClassYearBySlug, getLevelBySlug, trackUserLessonView, trackUserExerciseOpen } from '@/lib/firestore-data';
+import { useEffect, useState } from 'react';
+import { useUser } from '@/firebase/auth/use-user';
 
-export default async function LessonPage({ params }: { params: { lessonSlug: string } }) {
+
+const convertToEmbedUrl = (url: string) => {
+    if (!url) return '';
+    if (url.includes('youtube.com/watch?v=')) {
+        const videoId = url.split('v=')[1].split('&')[0];
+        return `https://www.youtube.com/embed/${videoId}`;
+    }
+    return url;
+};
+
+function ExercisesTab({ exercises, onExerciseOpen }: { exercises: Exercise[], onExerciseOpen: (exerciseId: string) => void }) {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline">Séries d'exercices</CardTitle>
+                <CardDescription>Téléchargez les séries d'exercices pour cette leçon.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {exercises.length > 0 ? exercises.map(ex => (
+                    <Card key={ex.id} className="p-4 flex items-center justify-between">
+                        <div>
+                            <h3 className="font-semibold">{ex.title}</h3>
+                            <p className="text-sm text-muted-foreground">{ex.description}</p>
+                        </div>
+                        <a href={ex.fileUrl} download onClick={() => onExerciseOpen(ex.id)}>
+                            <Button variant="outline" size="icon">
+                                <Download className="h-5 w-5" />
+                            </Button>
+                        </a>
+                    </Card>
+                )) : (
+                    <p className="text-muted-foreground text-center py-8">Aucun exercice disponible.</p>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
+export default function LessonPage({ params }: { params: { lessonSlug: string } }) {
   const { lessonSlug } = params;
-  const lesson = await getLessonBySlug(lessonSlug);
+  const { user } = useUser();
+  
+  const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [lessonSessions, setLessonSessions] = useState<RecordedSession[]>([]);
+  const [lessonExercises, setLessonExercises] = useState<Exercise[]>([]);
+  const [subject, setSubject] = useState<SubjectType | null>(null);
+  const [year, setYear] = useState<ClassYearType | null>(null);
+  const [level, setLevel] = useState<LevelType | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+        if (!lessonSlug) return;
+        setLoading(true);
+
+        const lessonData = await getLessonBySlug(lessonSlug);
+        setLesson(lessonData);
+
+        if (lessonData) {
+            const [sessionsData, exercisesData, subjectData] = await Promise.all([
+                getRecordedSessionsByLesson(lessonSlug),
+                getExercisesByLesson(lessonSlug),
+                getSubjectBySlug(lessonData.subjectSlug),
+            ]);
+
+            setLessonSessions(sessionsData);
+            setLessonExercises(exercisesData);
+            setSubject(subjectData);
+
+            if (subjectData) {
+                const yearData = await getClassYearBySlug(subjectData.classYearSlug, subjectData.classYearSlug);
+                setYear(yearData);
+                if (yearData) {
+                    const levelData = await getLevelBySlug(yearData.levelSlug);
+                    setLevel(levelData);
+                }
+            }
+        }
+        setLoading(false);
+    }
+    fetchData();
+  }, [lessonSlug]);
+
+  useEffect(() => {
+    if (user && lesson) {
+        trackUserLessonView(user.uid, lesson.slug);
+    }
+  }, [user, lesson]);
+
+  const handleExerciseOpen = (exerciseId: string) => {
+    if (user) {
+      trackUserExerciseOpen(user.uid, exerciseId);
+    }
+  };
+  
+  if (loading) {
+      // You can return a skeleton loader here
+      return <div className="container py-8">Loading...</div>
+  }
 
   if (!lesson) {
     notFound();
   }
-
-  const [lessonSessions, lessonExercises, subject] = await Promise.all([
-    getRecordedSessionsByLesson(lessonSlug),
-    getExercisesByLesson(lessonSlug),
-    getSubjectBySlug(lesson.subjectSlug),
-  ]);
-
-  const year = subject ? await getClassYearBySlug(subject.classYearSlug, subject.classYearSlug) : null;
-  const level = year ? await getLevelBySlug(year.levelSlug) : null;
 
   const breadcrumbItems: BreadcrumbItem[] = [
     { label: 'Parcourir', href: '/browse' },
@@ -70,7 +161,7 @@ export default async function LessonPage({ params }: { params: { lessonSlug: str
                       <h3 className="font-semibold mb-2">{session.title}</h3>
                       <div className="aspect-video w-full rounded-lg overflow-hidden border">
                         <iframe
-                          src={session.videoUrl}
+                          src={convertToEmbedUrl(session.videoUrl)}
                           title={session.title}
                           frameBorder="0"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -87,29 +178,7 @@ export default async function LessonPage({ params }: { params: { lessonSlug: str
               </Card>
             </TabsContent>
             <TabsContent value="exercises" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="font-headline">Séries d'exercices</CardTitle>
-                  <CardDescription>Téléchargez les séries d'exercices pour cette leçon.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {lessonExercises.length > 0 ? lessonExercises.map(ex => (
-                    <Card key={ex.id} className="p-4 flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold">{ex.title}</h3>
-                        <p className="text-sm text-muted-foreground">{ex.description}</p>
-                      </div>
-                      <a href={ex.fileUrl} download>
-                        <Button variant="outline" size="icon">
-                          <Download className="h-5 w-5" />
-                        </Button>
-                      </a>
-                    </Card>
-                  )) : (
-                    <p className="text-muted-foreground text-center py-8">Aucun exercice disponible.</p>
-                  )}
-                </CardContent>
-              </Card>
+                <ExercisesTab exercises={lessonExercises} onExerciseOpen={handleExerciseOpen} />
             </TabsContent>
             <TabsContent value="discussion" className="mt-6">
               <Card>

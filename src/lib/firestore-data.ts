@@ -1,7 +1,7 @@
 
-import { collection, getDocs, doc, getDoc, query, where, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, query, where, orderBy, Timestamp, collectionGroup,getCountFromServer } from 'firebase/firestore';
 import { db } from '@/firebase/config';
-import type { Level, ClassYear, Subject, Lesson, RecordedSession, Exercise, Comment, User } from './types';
+import type { Level, ClassYear, Subject, Lesson, RecordedSession, Exercise, Comment, User, DashboardStats } from './types';
 import { unstable_noStore as noStore } from 'next/cache';
 
 // Using unstable_noStore to prevent caching of fetched data.
@@ -51,21 +51,21 @@ export async function getClassYearsByLevel(levelSlug: string): Promise<ClassYear
 }
 
 export async function getClassYearBySlug(levelSlug: string, yearSlug: string): Promise<ClassYear | null> {
-  noStore();
-  try {
-    // Note: The original query had levelSlug as a filter, but class year slugs are unique.
-    // Kept for consistency, but `where('slug', '==', yearSlug)` is likely sufficient.
-    const q = query(collection(db, 'classYears'), where('slug', '==', yearSlug));
-    const querySnapshot = await getDocs(q);
-    if (querySnapshot.empty) {
-      return null;
+    noStore();
+    if (!yearSlug) return null;
+    try {
+        const q = query(collection(db, 'classYears'), where('slug', '==', yearSlug));
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) {
+            return null;
+        }
+        return querySnapshot.docs[0].data() as ClassYear;
+    } catch (error) {
+        console.error(`Error fetching class year by slug ${yearSlug}: `, error);
+        return null;
     }
-    return querySnapshot.docs[0].data() as ClassYear;
-  } catch (error) {
-    console.error(`Error fetching class year by slug ${yearSlug}: `, error);
-    return null;
-  }
 }
+
 
 export async function getSubjectsByYear(classYearSlug: string): Promise<Subject[]> {
   noStore();
@@ -81,6 +81,7 @@ export async function getSubjectsByYear(classYearSlug: string): Promise<Subject[
 
 export async function getSubjectBySlug(slug: string): Promise<Subject | null> {
     noStore();
+    if (!slug) return null;
     try {
         const q = query(collection(db, 'subjects'), where('slug', '==', slug));
         const querySnapshot = await getDocs(q);
@@ -123,6 +124,7 @@ export async function getLessonsBySubject(subjectSlug: string): Promise<Lesson[]
 
 export async function getLessonBySlug(slug: string): Promise<Lesson | null> {
     noStore();
+    if (!slug) return null;
     try {
         const q = query(collection(db, 'lessons'), where('slug', '==', slug));
         const querySnapshot = await getDocs(q);
@@ -198,5 +200,75 @@ export async function getUserProfile(userId: string): Promise<User | null> {
     } catch (error) {
         console.error(`Error fetching user profile for user ${userId}: `, error);
         return null;
+    }
+}
+
+export async function trackUserLessonView(userId: string, lessonSlug: string): Promise<void> {
+    noStore();
+    try {
+        const viewsCollection = collection(db, 'userLessonViews');
+        // Check if a view for this user and lesson already exists
+        const q = query(viewsCollection, where('userId', '==', userId), where('lessonSlug', '==', lessonSlug));
+        const existingView = await getDocs(q);
+
+        if (existingView.empty) {
+            await addDoc(viewsCollection, {
+                userId,
+                lessonSlug,
+                viewedAt: serverTimestamp(),
+            });
+        }
+    } catch (error) {
+        console.error(`Error tracking lesson view for user ${userId} and lesson ${lessonSlug}: `, error);
+    }
+}
+
+export async function trackUserExerciseOpen(userId: string, exerciseId: string): Promise<void> {
+    noStore();
+    try {
+        const opensCollection = collection(db, 'userExerciseOpens');
+        // Check if this exercise has been opened by the user before
+        const q = query(opensCollection, where('userId', '==', userId), where('exerciseId', '==', exerciseId));
+        const existingOpen = await getDocs(q);
+
+        if (existingOpen.empty) {
+            await addDoc(opensCollection, {
+                userId,
+                exerciseId,
+                openedAt: serverTimestamp(),
+            });
+        }
+    } catch (error) {
+        console.error(`Error tracking exercise open for user ${userId} and exercise ${exerciseId}: `, error);
+    }
+}
+
+export async function getUserDashboardStats(userId: string): Promise<DashboardStats> {
+    noStore();
+    const defaultStats: DashboardStats = {
+        lessonsViewed: 0,
+        exercisesOpened: 0,
+        timeTodaySeconds: 0,
+    };
+    if (!userId) return defaultStats;
+
+    try {
+        const lessonsQuery = query(collection(db, 'userLessonViews'), where('userId', '==', userId));
+        const exercisesQuery = query(collection(db, 'userExerciseOpens'), where('userId', '==', userId));
+
+        const [lessonsSnapshot, exercisesSnapshot] = await Promise.all([
+            getDocs(lessonsQuery),
+            getDocs(exercisesQuery)
+        ]);
+
+        return {
+            lessonsViewed: lessonsSnapshot.size,
+            exercisesOpened: exercisesSnapshot.size,
+            timeTodaySeconds: 0, // Not implemented yet
+        };
+
+    } catch (error) {
+        console.error(`Error fetching dashboard stats for user ${userId}: `, error);
+        return defaultStats;
     }
 }

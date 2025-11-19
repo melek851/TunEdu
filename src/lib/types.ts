@@ -83,3 +83,15 @@ export type BreadcrumbItem = {
   label: string;
   href: string;
 };
+
+export type UserLessonView = {
+  userId: string;
+  lessonSlug: string;
+  viewedAt: Timestamp;
+};
+
+export type UserExerciseOpen = {
+  userId: string;
+  exerciseId: string;
+  openedAt: Timestamp;
+};

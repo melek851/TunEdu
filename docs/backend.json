@@ -112,6 +112,28 @@
         "parentId": { "type": "string" }
       },
       "required": ["id", "lessonId", "user", "body", "createdAt"]
+    },
+    "UserLessonView": {
+      "title": "UserLessonView",
+      "description": "Tracks when a user has viewed a lesson.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "lessonSlug": { "type": "string" },
+        "viewedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "lessonSlug", "viewedAt"]
+    },
+    "UserExerciseOpen": {
+      "title": "UserExerciseOpen",
+      "description": "Tracks when a user has opened an exercise.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "exerciseId": { "type": "string" },
+        "openedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "exerciseId", "openedAt"]
     }
   },
   "auth": {
@@ -149,6 +171,14 @@
     "/comments/{commentId}": {
       "schema": { "$ref": "#/backend/entities/Comment" },
       "description": "Stores comments for lessons."
+    },
+    "/userLessonViews/{viewId}": {
+      "schema": { "$ref": "#/backend/entities/UserLessonView" },
+      "description": "Tracks user lesson views."
+    },
+    "/userExerciseOpens/{openId}": {
+      "schema": { "$ref": "#/backend/entities/UserExerciseOpen" },
+      "description": "Tracks user exercise opens."
     }
   }
 }
