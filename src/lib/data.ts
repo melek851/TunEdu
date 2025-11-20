@@ -1,95 +1,112 @@
 
-import type { Level, ClassYear, Subject, Lesson, RecordedSession, Exercise } from './types';
+import type { RecordedSession, Exercise } from './types';
 
-export const levels: Level[] = [
-  { id: 'primaire', name: 'Primaire', slug: 'primaire', order: 1, yearCount: 6 },
-  { id: 'college', name: 'Collège', slug: 'college', order: 2, yearCount: 3 },
-  { id: 'lycee', name: 'Lycée', slug: 'lycee', order: 3, yearCount: 4 },
-];
-
-export const classYears: ClassYear[] = [
-  // Primaire
-  { id: '1ere-annee', levelSlug: 'primaire', name: '1ère Année', slug: '1ere-annee', order: 1 },
-  { id: '2eme-annee', levelSlug: 'primaire', name: '2ème Année', slug: '2eme-annee', order: 2 },
-  { id: '3eme-annee', levelSlug: 'primaire', name: '3ème Année', slug: '3eme-annee', order: 3 },
-  { id: '4eme-annee', levelSlug: 'primaire', name: '4ème Année', slug: '4eme-annee', order: 4 },
-  { id: '5eme-annee', levelSlug: 'primaire', name: '5ème Année', slug: '5eme-annee', order: 5 },
-  { id: '6eme-annee', levelSlug: 'primaire', name: '6ème Année', slug: '6eme-annee', order: 6 },
-  // Collège
-  { id: '7eme-annee', levelSlug: 'college', name: '7ème Année', slug: '7eme-annee', order: 7 },
-  { id: '8eme-annee', levelSlug: 'college', name: '8ème Année', slug: '8eme-annee', order: 8 },
-  { id: '9eme-annee', levelSlug: 'college', name: '9ème Année', slug: '9eme-annee', order: 9 },
-  // Lycée
-  { id: '1ere-annee-secondaire', levelSlug: 'lycee', name: '1ère Année', slug: '1ere-annee-secondaire', order: 10 },
-  { id: '2eme-annee-secondaire', levelSlug: 'lycee', name: '2ème Année', slug: '2eme-annee-secondaire', order: 11 },
-  { id: '3eme-annee-secondaire', levelSlug: 'lycee', name: '3ème Année', slug: '3eme-annee-secondaire', order: 12 },
-  { id: 'baccalaureat', levelSlug: 'lycee', name: 'Baccalauréat', slug: 'baccalaureat', order: 13 },
-];
-
-export const subjects: Subject[] = [
-  // 1ère Année Primaire
-  { id: 'ar-1ere', classYearSlug: '1ere-annee', name: 'Lecture Arabe', slug: 'ar-1ere', description: 'Apprendre à lire et écrire les lettres arabes.', manualUrl: '/manuals/placeholder.pdf', thumbnailUrl: 'https://picsum.photos/seed/ar-1ere/600/400', thumbnailHint: 'arabic calligraphy' },
-  { id: 'graph-1ere', classYearSlug: '1ere-annee', name: 'Graphisme', slug: 'graph-1ere', description: 'Développer la motricité fine à travers le dessin.', manualUrl: '/manuals/placeholder.pdf', thumbnailUrl: 'https://picsum.photos/seed/graph-1ere/600/400', thumbnailHint: 'drawing kids' },
-  { id: 'maths-1ere', classYearSlug: '1ere-annee', name: 'Mathématiques', slug: 'maths-1ere', description: 'Introduction aux nombres et aux formes.', manualUrl: '/manuals/placeholder.pdf', thumbnailUrl: 'https://picsum.photos/seed/maths-1ere/600/400', thumbnailHint: 'numbers shapes' },
-  // 6ème Année Primaire
-  { id: 'fr-6eme', classYearSlug: '6eme-annee', name: 'Français', slug: 'fr-6eme', description: 'Grammaire, conjugaison, et lecture de textes.', manualUrl: '/manuals/placeholder.pdf', thumbnailUrl: 'https://picsum.photos/seed/fr-6eme/600/400', thumbnailHint: 'french book' },
-  { id: 'svt-6eme', classYearSlug: '6eme-annee', name: 'Sciences de la vie', slug: 'svt-6eme', description: 'Le corps humain et l\'environnement.', manualUrl: '/manuals/placeholder.pdf', thumbnailUrl: 'https://picsum.photos/seed/svt-6eme/600/400', thumbnailHint: 'human anatomy' },
-  { id: 'educ-civ-6eme', classYearSlug: '6eme-annee', name: 'Éducation civique', slug: 'educ-civ-6eme', description: 'Les droits et les devoirs du citoyen.', manualUrl: '/manuals/placeholder.pdf', thumbnailUrl: 'https://picsum.photos/seed/educ-civ-6eme/600/400', thumbnailHint: 'tunisian flag' },
-  // Baccalauréat
-  { id: 'math-bac', classYearSlug: 'baccalaureat', name: 'Mathématiques', slug: 'math-bac', description: 'Analyse, algèbre, et probabilités pour le bac.', manualUrl: '/manuals/placeholder.pdf', thumbnailUrl: 'https://picsum.photos/seed/math-bac/600/400', thumbnailHint: 'abstract math' },
-  { id: 'physique-bac', classYearSlug: 'baccalaureat', name: 'Physique-Chimie', slug: 'physique-bac', description: 'Mécanique, électricité, et chimie organique.', manualUrl: '/manuals/placeholder.pdf', thumbnailUrl: 'https://picsum.photos/seed/physique-bac/600/400', thumbnailHint: 'atom model' },
-  { id: 'philo-bac', classYearSlug: 'baccalaureat', name: 'Philosophie', slug: 'philo-bac', description: 'Étude des grands courants de pensée.', manualUrl: '/manuals/placeholder.pdf', thumbnailUrl: 'https://picsum.photos/seed/philo-bac/600/400', thumbnailHint: 'philosophy statue' },
-];
-
-export const lessons: Lesson[] = [
-    // 1ère Année Primaire - Arabe
-    { id: 'alif', subjectSlug: 'ar-1ere', title: 'La lettre Alif (أ)', slug: 'alif', summary: 'Apprendre à reconnaître, écrire et prononcer la lettre Alif.', order: 1, score: 85 },
-    // 1ère Année Primaire - Graphisme
-    { id: 'lignes-droites', subjectSlug: 'graph-1ere', title: 'Tracer des lignes droites', slug: 'lignes-droites', summary: 'Exercices pour maîtriser le tracé des lignes verticales et horizontales.', order: 1, score: 92 },
-    // 1ère Année Primaire - Maths
-    { id: 'compter-5', subjectSlug: 'maths-1ere', title: 'Compter jusqu\'à 5', slug: 'compter-5', summary: 'Introduction aux chiffres de 1 à 5 et au dénombrement.', order: 1, score: 78 },
-    // 6ème Année Primaire - Français
-    { id: 'passe-compose', subjectSlug: 'fr-6eme', title: 'Le passé composé', slug: 'passe-compose', summary: 'Formation et utilisation du passé composé avec les auxiliaires avoir et être.', order: 1, score: 88 },
-    // 6ème Année Primaire - SVT
-    { id: 'systeme-digestif', subjectSlug: 'svt-6eme', title: 'Le système digestif', slug: 'systeme-digestif', summary: 'Le trajet des aliments et la transformation en nutriments.', order: 1, score: 95 },
-    // 6ème Année Primaire - Éducation civique
-    { id: 'constitution-tunisienne', subjectSlug: 'educ-civ-6eme', title: 'La constitution tunisienne', slug: 'constitution-tunisienne', summary: 'Introduction aux principes fondamentaux de la constitution.', order: 1, score: 82 },
-    // Baccalauréat - Mathématiques
-    { id: 'fonctions-log', subjectSlug: 'math-bac', title: 'Fonctions Logarithmiques', slug: 'fonctions-log', summary: 'Étude complète de la fonction logarithme népérien.', order: 1, score: 90 },
-    { id: 'nombres-complexes', subjectSlug: 'math-bac', title: 'Nombres Complexes', slug: 'nombres-complexes', summary: 'Forme algébrique, trigonométrique et exponentielle.', order: 2, score: 85 },
-    // Baccalauréat - Physique
-    { id: 'dipole-rc', subjectSlug: 'physique-bac', title: 'Le Dipôle RC', slug: 'dipole-rc', summary: 'Charge et décharge d\'un condensateur, équations différentielles.', order: 1, score: 88 },
-    // Baccalauréat - Philosophie
-    { id: 'liberte-bac', subjectSlug: 'philo-bac', title: 'La Liberté', slug: 'liberte-bac', summary: 'Analyse des concepts de liberté et de déterminisme.', order: 1, score: 76 },
-];
+// IMPORTANT: This file is intended for a one-time seeding operation.
+// After running the seed command to add these sessions and exercises,
+// you should restore the full data set to this file to avoid build errors.
 
 export const recordedSessions: RecordedSession[] = [
-  { id: 'session-alif', lessonSlug: 'alif', title: 'Session Vidéo pour La lettre Alif (أ)', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1200 },
-  { id: 'session-lignes-droites', lessonSlug: 'lignes-droites', title: 'Session Vidéo pour Tracer des lignes droites', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1100 },
-  { id: 'session-compter-5', lessonSlug: 'compter-5', title: 'Session Vidéo pour Compter jusqu\'à 5', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1300 },
-  { id: 'session-passe-compose', lessonSlug: 'passe-compose', title: 'Session Vidéo pour Le passé composé', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 2100 },
-  { id: 'session-systeme-digestif', lessonSlug: 'systeme-digestif', title: 'Session Vidéo pour Le système digestif', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 2400 },
-  { id: 'session-constitution-tunisienne', lessonSlug: 'constitution-tunisienne', title: 'Session Vidéo pour La constitution tunisienne', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 2800 },
-  { id: 'session-fonctions-log', lessonSlug: 'fonctions-log', title: 'Session Vidéo pour Fonctions Logarithmiques', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 3600 },
-  { id: 'session-nombres-complexes', lessonSlug: 'nombres-complexes', title: 'Session Vidéo pour Nombres Complexes', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 3400 },
-  { id: 'session-dipole-rc', lessonSlug: 'dipole-rc', title: 'Session Vidéo pour Le Dipôle RC', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 4000 },
-  { id: 'session-liberte-bac', lessonSlug: 'liberte-bac', title: 'Session Vidéo pour La Liberté', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 3600 },
+  // Primaire
+  { id: 'session-alif', lessonSlug: 'alif', title: 'Session Vidéo pour La lettre Alif (أ)', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-lignes-droites', lessonSlug: 'lignes-droites', title: 'Session Vidéo pour Tracer des lignes droites', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-compter-5', lessonSlug: 'compter-5', title: 'Session Vidéo pour Compter jusqu\'à 5', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-mots-3-lettres', lessonSlug: 'mots-3-lettres', title: 'Session Vidéo pour Lire des mots de 3 lettres', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-addition-simple-2eme', lessonSlug: 'addition-simple-2eme', title: 'Session Vidéo pour L\'addition simple', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-etats-eau', lessonSlug: 'etats-eau', title: 'Session Vidéo pour Les états de l\'eau', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-se-presenter', lessonSlug: 'se-presenter', title: 'Session Vidéo pour Se présenter', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-nom-verbe', lessonSlug: 'nom-verbe', title: 'Session Vidéo pour Le nom et le verbe', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-table-2', lessonSlug: 'table-2', title: 'Session Vidéo pour La table de multiplication de 2', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-passe-compose', lessonSlug: 'passe-compose', title: 'Session Vidéo pour Le passé composé', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-fractions-simples', lessonSlug: 'fractions-simples', title: 'Session Vidéo pour Les fractions simples', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-carthage', lessonSlug: 'carthage', title: 'Session Vidéo pour Carthage', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-irab-simple', lessonSlug: 'irab-simple', title: 'Session Vidéo pour L\'analyse grammaticale (I’rab)', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-futur-simple', lessonSlug: 'futur-simple', title: 'Session Vidéo pour Le futur simple', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-systeme-digestif', lessonSlug: 'systeme-digestif', title: 'Session Vidéo pour Le système digestif', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-constitution-tunisienne', lessonSlug: 'constitution-tunisienne', title: 'Session Vidéo pour La constitution tunisienne', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-regle-de-trois', lessonSlug: 'regle-de-trois', title: 'Session Vidéo pour La règle de trois', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-texte-narratif', lessonSlug: 'texte-narratif', title: 'Session Vidéo pour Analyse d\'un texte narratif', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  // Collège
+  { id: 'session-greetings-7eme', lessonSlug: 'greetings-7eme', title: 'Session Vidéo pour Greetings and Introductions', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-ensembles-7eme', lessonSlug: 'ensembles-7eme', title: 'Session Vidéo pour Les ensembles et les opérations', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-mesure-volume', lessonSlug: 'mesure-volume', title: 'Session Vidéo pour La mesure de volume', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-description-8eme', lessonSlug: 'description-8eme', title: 'Session Vidéo pour La description', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-civilisation-islamique', lessonSlug: 'civilisation-islamique', title: 'Session Vidéo pour La civilisation islamique', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-boucles-algo', lessonSlug: 'boucles-algo', title: 'Session Vidéo pour Les Boucles', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-discours-rapporte', lessonSlug: 'discours-rapporte', title: 'Session Vidéo pour Le Discours Direct et Indirect', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-figures-de-style', lessonSlug: 'figures-de-style', title: 'Session Vidéo pour Les figures de style', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-equations-9eme', lessonSlug: 'equations-9eme', title: 'Session Vidéo pour Les équations du premier degré', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-genetique-9eme', lessonSlug: 'genetique-9eme', title: 'Session Vidéo pour La transmission des caractères héréditaires', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-systeme-nerveux-9eme', lessonSlug: 'systeme-nerveux-9eme', title: 'Session Vidéo pour Le système nerveux', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  // Lycée
+  { id: 'session-renaissance-europe', lessonSlug: 'renaissance-europe', title: 'Session Vidéo pour La Renaissance en Europe', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-climats-monde', lessonSlug: 'climats-monde', title: 'Session Vidéo pour Les climats dans le monde', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-atome-1ere', lessonSlug: 'atome-1ere', title: 'Session Vidéo pour L\'atome', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-marche-eco', lessonSlug: 'marche-eco', title: 'Session Vidéo pour Le Marché', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-entreprise-env', lessonSlug: 'entreprise-env', title: 'Session Vidéo pour L\'entreprise et son environnement', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-cao-2eme', lessonSlug: 'cao-2eme', title: 'Session Vidéo pour Introduction à la CAO', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-limites-3eme', lessonSlug: 'limites-3eme', title: 'Session Vidéo pour Les limites de fonctions', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-pointeurs-3eme', lessonSlug: 'pointeurs-3eme', title: 'Session Vidéo pour Les pointeurs et l\'allocation dynamique', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-raison-reel', lessonSlug: 'raison-reel', title: 'Session Vidéo pour La raison et le réel', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  // BAC
+  { id: 'session-fonctions-log', lessonSlug: 'fonctions-log', title: 'Session Vidéo pour Fonctions Logarithmiques', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-nombres-complexes', lessonSlug: 'nombres-complexes', title: 'Session Vidéo pour Nombres Complexes', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-probabilites', lessonSlug: 'probabilites', title: 'Session Vidéo pour Probabilités', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-dipole-rc', lessonSlug: 'dipole-rc', title: 'Session Vidéo pour La Dipôle RC', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-modulation', lessonSlug: 'modulation', title: 'Session Vidéo pour Modulation et Démodulation', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-graphes-bac', lessonSlug: 'graphes-bac', title: 'Session Vidéo pour Les Graphes', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-conscience-inconscient-bac', lessonSlug: 'conscience-inconscient-bac', title: 'Session Vidéo pour La Conscience et l\'Inconscient', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
+  { id: 'session-liberte-bac', lessonSlug: 'liberte-bac', title: 'Session Vidéo pour La Liberté', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
 ];
 
 export const exercises: Exercise[] = [
-  // 1ère Année
-  { id: 'ex-alif-1', lessonSlug: 'alif', title: 'Écrire la lettre Alif', description: 'Entraînez-vous à écrire la lettre Alif sous toutes ses formes.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'EASY' },
-  { id: 'ex-lignes-1', lessonSlug: 'lignes-droites', title: 'Exercice de traçage', description: 'Suivez les pointillés pour tracer des lignes droites et des formes simples.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'EASY' },
-  { id: 'ex-compter-5-1', lessonSlug: 'compter-5', title: 'Compter les objets', description: 'Comptez les fruits dans chaque panier et écrivez le chiffre.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'EASY' },
-  // 6ème Année
-  { id: 'ex-pc-1', lessonSlug: 'passe-compose', title: 'Conjugaison au passé composé', description: 'Mettez les verbes entre parenthèses au passé composé.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
-  { id: 'ex-digestif-1', lessonSlug: 'systeme-digestif', title: 'Schéma du système digestif', description: 'Légendez le schéma du système digestif humain.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
-  { id: 'ex-civique-1', lessonSlug: 'constitution-tunisienne', title: 'Questions sur la constitution', description: 'Répondez aux questions sur les droits et devoirs du citoyen.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
-  // Bac
-  { id: 'ex-log-1', lessonSlug: 'fonctions-log', title: 'Étude de fonction Log', description: 'Étude complète d\'une fonction logarithmique avec tracé de courbe.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
-  { id: 'ex-complexes-1', lessonSlug: 'nombres-complexes', title: 'Opérations sur les complexes', description: 'Résolvez des équations et effectuez des opérations sur les nombres complexes.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
-  { id: 'ex-rc-1', lessonSlug: 'dipole-rc', title: 'Exercice sur le dipôle RC', description: 'Calculez la constante de temps et analysez la charge du condensateur.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
-  { id: 'ex-liberte-1', lessonSlug: 'liberte-bac', title: 'Dissertation philosophique', description: 'Rédigez une dissertation sur le sujet : "Sommes-nous réellement libres ?".', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  // Primaire
+  { id: 'ex-alif-1', lessonSlug: 'alif', title: 'Exercices sur la lettre Alif', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'EASY' },
+  { id: 'ex-lignes-droites-1', lessonSlug: 'lignes-droites', title: 'Exercices sur le traçage', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'EASY' },
+  { id: 'ex-compter-5-1', lessonSlug: 'compter-5', title: 'Exercices pour compter jusqu\'à 5', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'EASY' },
+  { id: 'ex-mots-3-lettres-1', lessonSlug: 'mots-3-lettres', title: 'Exercices de lecture de mots', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'EASY' },
+  { id: 'ex-addition-simple-2eme-1', lessonSlug: 'addition-simple-2eme', title: 'Exercices d\'addition', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'EASY' },
+  { id: 'ex-etats-eau-1', lessonSlug: 'etats-eau', title: 'Exercices sur les états de l\'eau', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'EASY' },
+  { id: 'ex-se-presenter-1', lessonSlug: 'se-presenter', title: 'Exercices pour se présenter', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'EASY' },
+  { id: 'ex-nom-verbe-1', lessonSlug: 'nom-verbe', title: 'Exercices sur le nom et le verbe', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'EASY' },
+  { id: 'ex-table-2-1', lessonSlug: 'table-2', title: 'Exercices sur la table de 2', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'EASY' },
+  { id: 'ex-passe-compose-1', lessonSlug: 'passe-compose', title: 'Exercices sur le passé composé', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
+  { id: 'ex-fractions-simples-1', lessonSlug: 'fractions-simples', title: 'Exercices sur les fractions', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
+  { id: 'ex-carthage-1', lessonSlug: 'carthage', title: 'Exercices sur Carthage', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
+  { id: 'ex-irab-simple-1', lessonSlug: 'irab-simple', title: 'Exercices d\'I\'rab', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
+  { id: 'ex-futur-simple-1', lessonSlug: 'futur-simple', title: 'Exercices sur le futur simple', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
+  { id: 'ex-systeme-digestif-1', lessonSlug: 'systeme-digestif', title: 'Exercices sur le système digestif', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
+  { id: 'ex-constitution-tunisienne-1', lessonSlug: 'constitution-tunisienne', title: 'Exercices sur la constitution', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
+  { id: 'ex-regle-de-trois-1', lessonSlug: 'regle-de-trois', title: 'Exercices sur la règle de trois', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
+  { id: 'ex-texte-narratif-1', lessonSlug: 'texte-narratif', title: 'Exercices sur le texte narratif', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
+  // Collège
+  { id: 'ex-greetings-7eme-1', lessonSlug: 'greetings-7eme', title: 'Exercises on Greetings', description: 'Application exercises.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'EASY' },
+  { id: 'ex-ensembles-7eme-1', lessonSlug: 'ensembles-7eme', title: 'Exercices sur les ensembles', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
+  { id: 'ex-mesure-volume-1', lessonSlug: 'mesure-volume', title: 'Exercices de mesure de volume', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
+  { id: 'ex-description-8eme-1', lessonSlug: 'description-8eme', title: 'Exercices de description', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
+  { id: 'ex-civilisation-islamique-1', lessonSlug: 'civilisation-islamique', title: 'Exercices sur la civilisation islamique', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
+  { id: 'ex-boucles-algo-1', lessonSlug: 'boucles-algo', title: 'Exercices sur les boucles', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'MEDIUM' },
+  { id: 'ex-discours-rapporte-1', lessonSlug: 'discours-rapporte', title: 'Exercices sur le discours rapporté', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-figures-de-style-1', lessonSlug: 'figures-de-style', title: 'Exercices sur les figures de style', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-equations-9eme-1', lessonSlug: 'equations-9eme', title: 'Exercices sur les équations', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-genetique-9eme-1', lessonSlug: 'genetique-9eme', title: 'Exercices sur la génétique', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-systeme-nerveux-9eme-1', lessonSlug: 'systeme-nerveux-9eme', title: 'Exercices sur le système nerveux', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  // Lycée
+  { id: 'ex-renaissance-europe-1', lessonSlug: 'renaissance-europe', title: 'Exercices sur la Renaissance', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-climats-monde-1', lessonSlug: 'climats-monde', title: 'Exercices sur les climats', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-atome-1ere-1', lessonSlug: 'atome-1ere', title: 'Exercices sur l\'atome', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-marche-eco-1', lessonSlug: 'marche-eco', title: 'Exercices sur le marché', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-entreprise-env-1', lessonSlug: 'entreprise-env', title: 'Exercices sur l\'entreprise', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-cao-2eme-1', lessonSlug: 'cao-2eme', title: 'Exercices de CAO', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-limites-3eme-1', lessonSlug: 'limites-3eme', title: 'Exercices sur les limites', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-pointeurs-3eme-1', lessonSlug: 'pointeurs-3eme', title: 'Exercices sur les pointeurs', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-raison-reel-1', lessonSlug: 'raison-reel', title: 'Exercices sur la raison et le réel', description: 'Séries d\'exercices d\'application.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  // BAC
+  { id: 'ex-fonctions-log-1', lessonSlug: 'fonctions-log', title: 'Problèmes sur les fonctions log', description: 'Séries d\'exercices de type bac.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-nombres-complexes-1', lessonSlug: 'nombres-complexes', title: 'Problèmes sur les nombres complexes', description: 'Séries d\'exercices de type bac.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-probabilites-1', lessonSlug: 'probabilites', title: 'Problèmes sur les probabilités', description: 'Séries d\'exercices de type bac.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-dipole-rc-1', lessonSlug: 'dipole-rc', title: 'Problèmes sur le dipôle RC', description: 'Séries d\'exercices de type bac.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-modulation-1', lessonSlug: 'modulation', title: 'Problèmes sur la modulation', description: 'Séries d\'exercices de type bac.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-graphes-bac-1', lessonSlug: 'graphes-bac', title: 'Problèmes sur les graphes', description: 'Séries d\'exercices de type bac.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-conscience-inconscient-bac-1', lessonSlug: 'conscience-inconscient-bac', title: 'Dissertations sur la conscience', description: 'Sujets de dissertation de type bac.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
+  { id: 'ex-liberte-bac-1', lessonSlug: 'liberte-bac', title: 'Dissertations sur la liberté', description: 'Sujets de dissertation de type bac.', fileUrl: '/exercises/placeholder.pdf', difficulty: 'HARD' },
 ];
-
-export const comments: Comment[] = [];

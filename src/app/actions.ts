@@ -6,7 +6,7 @@ import { doc, setDoc, addDoc, collection, serverTimestamp, writeBatch } from 'fi
 import { auth, db } from '@/firebase/config';
 import { redirect } from 'next/navigation';
 import { aiSubjectAssistant } from '@/ai/flows/ai-subject-assistant';
-import { levels, classYears, subjects, lessons, recordedSessions, exercises } from '@/lib/data';
+import { recordedSessions, exercises } from '@/lib/data';
 
 const SignUpSchema = z
   .object({
@@ -168,10 +168,6 @@ export async function seedDatabase(prevState: any, formData: FormData) {
   try {
     const batch = writeBatch(db);
     
-    await seedCollection(batch, 'levels', levels);
-    await seedCollection(batch, 'classYears', classYears);
-    await seedCollection(batch, 'subjects', subjects);
-    await seedCollection(batch, 'lessons', lessons);
     await seedCollection(batch, 'recordedSessions', recordedSessions);
     await seedCollection(batch, 'exercises', exercises);
 
@@ -179,7 +175,7 @@ export async function seedDatabase(prevState: any, formData: FormData) {
 
     return {
       message: `Database seeded successfully! Uploaded ${
-        levels.length + classYears.length + subjects.length + lessons.length + recordedSessions.length + exercises.length
+        recordedSessions.length + exercises.length
       } documents.`,
       success: true,
     };
