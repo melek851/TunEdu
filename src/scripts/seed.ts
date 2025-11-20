@@ -1,6 +1,6 @@
 
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, doc, setDoc, writeBatch } from 'firebase/firestore';
+import { getFirestore, collection, doc, writeBatch } from 'firebase/firestore';
 import { levels, classYears, subjects, lessons, recordedSessions, exercises } from '../lib/data';
 import 'dotenv/config';
 

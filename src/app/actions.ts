@@ -2,10 +2,11 @@
 
 import { z } from 'zod';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, addDoc, collection, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { auth, db } from '@/firebase/config';
 import { redirect } from 'next/navigation';
 import { aiSubjectAssistant } from '@/ai/flows/ai-subject-assistant';
+import { levels, classYears, subjects, lessons, recordedSessions, exercises } from '@/lib/data';
 
 const SignUpSchema = z
   .object({
@@ -145,4 +146,43 @@ export async function logTimeSpent(formData: FormData) {
   } catch (error) {
     console.error("Error logging time spent:", error);
   }
+}
+
+async function seedCollection<T extends { id: string }>(collectionName: string, data: T[], batch: any) {
+  if (data.length === 0) {
+    console.log(`No data to seed for ${collectionName}.`);
+    return;
+  }
+  
+  const collectionRef = collection(db, collectionName);
+  
+  console.log(`Preparing batch for ${collectionName}...`);
+  
+  data.forEach((item) => {
+    const docRef = doc(collectionRef, item.id);
+    batch.set(docRef, item);
+  });
+  
+  console.log(`Batch for ${collectionName} prepared with ${data.length} documents.`);
+}
+
+export async function seedDatabase() {
+    console.log('Starting database seed process from server action...');
+    const batch = writeBatch(db);
+
+    try {
+        await seedCollection('levels', levels, batch);
+        await seedCollection('classYears', classYears, batch);
+        await seedCollection('subjects', subjects, batch);
+        await seedCollection('lessons', lessons, batch);
+        await seedCollection('recordedSessions', recordedSessions, batch);
+        await seedCollection('exercises', exercises, batch);
+
+        await batch.commit();
+        console.log('\n🎉 Database seeding completed successfully!');
+        return { success: true, message: 'Database seeded successfully!' };
+    } catch (error) {
+        console.error('❌ Error seeding database:', error);
+        return { success: false, message: `Error seeding database: ${error}` };
+    }
 }
