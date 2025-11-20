@@ -161,7 +161,6 @@ export const lessons: Lesson[] = [
 
 
 export const recordedSessions: RecordedSession[] = [
-  // Primaire
   { id: 'session-alif', lessonSlug: 'alif', title: 'Session Vidéo pour La lettre Alif (أ)', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
   { id: 'session-lignes-droites', lessonSlug: 'lignes-droites', title: 'Session Vidéo pour Tracer des lignes droites', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
   { id: 'session-compter-5', lessonSlug: 'compter-5', title: 'Session Vidéo pour Compter jusqu\'à 5', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
@@ -180,7 +179,6 @@ export const recordedSessions: RecordedSession[] = [
   { id: 'session-constitution-tunisienne', lessonSlug: 'constitution-tunisienne', title: 'Session Vidéo pour La constitution tunisienne', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
   { id: 'session-regle-de-trois', lessonSlug: 'regle-de-trois', title: 'Session Vidéo pour La règle de trois', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
   { id: 'session-texte-narratif', lessonSlug: 'texte-narratif', title: 'Session Vidéo pour Analyse d\'un texte narratif', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
-  // Collège
   { id: 'session-greetings-7eme', lessonSlug: 'greetings-7eme', title: 'Session Vidéo pour Greetings and Introductions', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
   { id: 'session-ensembles-7eme', lessonSlug: 'ensembles-7eme', title: 'Session Vidéo pour Les ensembles et les opérations', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
   { id: 'session-mesure-volume', lessonSlug: 'mesure-volume', title: 'Session Vidéo pour La mesure de volume', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
@@ -192,7 +190,6 @@ export const recordedSessions: RecordedSession[] = [
   { id: 'session-equations-9eme', lessonSlug: 'equations-9eme', title: 'Session Vidéo pour Les équations du premier degré', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
   { id: 'session-genetique-9eme', lessonSlug: 'genetique-9eme', title: 'Session Vidéo pour La transmission des caractères héréditaires', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
   { id: 'session-systeme-nerveux-9eme', lessonSlug: 'systeme-nerveux-9eme', title: 'Session Vidéo pour Le système nerveux', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
-  // Lycée
   { id: 'session-renaissance-europe', lessonSlug: 'renaissance-europe', title: 'Session Vidéo pour La Renaissance en Europe', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
   { id: 'session-climats-monde', lessonSlug: 'climats-monde', title: 'Session Vidéo pour Les climats dans le monde', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
   { id: 'session-atome-1ere', lessonSlug: 'atome-1ere', title: 'Session Vidéo pour L\'atome', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
@@ -202,7 +199,6 @@ export const recordedSessions: RecordedSession[] = [
   { id: 'session-limites-3eme', lessonSlug: 'limites-3eme', title: 'Session Vidéo pour Les limites de fonctions', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
   { id: 'session-pointeurs-3eme', lessonSlug: 'pointeurs-3eme', title: 'Session Vidéo pour Les pointeurs et l\'allocation dynamique', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
   { id: 'session-raison-reel', lessonSlug: 'raison-reel', title: 'Session Vidéo pour La raison et le réel', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
-  // BAC
   { id: 'session-fonctions-log', lessonSlug: 'fonctions-log', title: 'Session Vidéo pour Fonctions Logarithmiques', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
   { id: 'session-nombres-complexes', lessonSlug: 'nombres-complexes', title: 'Session Vidéo pour Nombres Complexes', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
   { id: 'session-probabilites', lessonSlug: 'probabilites', title: 'Session Vidéo pour Probabilités', videoUrl: 'https://www.youtube.com/embed/k9zY1lplD9c', durationSeconds: 1800 },
@@ -267,5 +263,7 @@ export const exercises: Exercise[] = [
 ];
 
 export const comments: Comment[] = []; // Empty, as comments are user-generated
+
+    
 
     
