@@ -16,7 +16,7 @@ import { getLevelBySlug, getClassYearBySlug, getSubjectsByYear } from '@/lib/fir
 export default async function BrowseSubjectsPage({ params }: { params: { levelSlug: string, yearSlug: string } }) {
   const { levelSlug, yearSlug } = params;
   const level = await getLevelBySlug(levelSlug);
-  const year = await getClassYearBySlug(levelSlug, yearSlug);
+  const year = await getClassYearBySlug(yearSlug);
 
   if (!level || !year) {
     notFound();
