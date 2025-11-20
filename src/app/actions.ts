@@ -2,11 +2,10 @@
 
 import { z } from 'zod';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, addDoc, collection, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { doc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/firebase/config';
 import { redirect } from 'next/navigation';
 import { aiSubjectAssistant } from '@/ai/flows/ai-subject-assistant';
-import { levels, classYears, subjects, lessons, recordedSessions, exercises } from '@/lib/data';
 
 const SignUpSchema = z
   .object({
@@ -147,49 +146,3 @@ export async function logTimeSpent(formData: FormData) {
     console.error("Error logging time spent:", error);
   }
 }
-
-// --- Database Seeding Action ---
-
-async function seedCollection<T extends { id: string }>(
-  batch: ReturnType<typeof writeBatch>,
-  collectionName: string,
-  data: T[]
-) {
-  if (data.length > 0) {
-    const collectionRef = collection(db, collectionName);
-    data.forEach((item) => {
-      const docRef = doc(collectionRef, item.id);
-      batch.set(docRef, item);
-    });
-  }
-}
-
-export async function seedDatabase(prevState: any, formData: FormData) {
-  try {
-    const batch = writeBatch(db);
-    
-    await seedCollection(batch, 'levels', levels);
-    await seedCollection(batch, 'classYears', classYears);
-    await seedCollection(batch, 'subjects', subjects);
-    await seedCollection(batch, 'lessons', lessons);
-    await seedCollection(batch, 'recordedSessions', recordedSessions);
-    await seedCollection(batch, 'exercises', exercises);
-
-    await batch.commit();
-
-    return {
-      message: `Database seeded successfully! Uploaded ${
-        levels.length + classYears.length + subjects.length + lessons.length + recordedSessions.length + exercises.length
-      } documents.`,
-      success: true,
-    };
-  } catch (error: any) {
-    console.error('Error seeding database:', error);
-    return {
-      message: `Error seeding database: ${error.message}`,
-      success: false,
-    };
-  }
-}
-
-    
