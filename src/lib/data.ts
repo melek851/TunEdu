@@ -121,28 +121,40 @@ export const lessons: Lesson[] = [
 ];
 
 export const recordedSessions: RecordedSession[] = [
-    // Fonctions Log
     {
-        id: 'log-session-1',
+        id: 'session-1',
         lessonSlug: 'fonctions-logarithmes',
-        title: 'Partie 1: Introduction et Propriétés',
-        videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        durationSeconds: 900
+        title: 'Session 1: Introduction et Propriétés des Logarithmes',
+        videoUrl: 'https://www.youtube.com/embed/kM8K0a0KxIw?si=Y8wRceBtFxzGBJpr',
+        durationSeconds: 1800
     },
     {
-        id: 'log-session-2',
-        lessonSlug: 'fonctions-logarithmes',
-        title: 'Partie 2: Étude de la fonction et Limites',
-        videoUrl: 'https://www.youtube.com/watch?v=o-YBDTqX_ZU',
-        durationSeconds: 1200
+        id: 'session-2',
+        lessonSlug: 'fonctions-exponentielles',
+        title: 'Session 1: Introduction aux Exponentielles',
+        videoUrl: 'https://www.youtube.com/embed/kM8K0a0KxIw?si=Y8wRceBtFxzGBJpr',
+        durationSeconds: 1800
     },
-    // Dipôle RC
     {
-        id: 'rc-session-1',
+        id: 'session-3',
+        lessonSlug: 'suites-reelles',
+        title: 'Session 1: Introduction aux Suites Réelles',
+        videoUrl: 'https://www.youtube.com/embed/kM8K0a0KxIw?si=Y8wRceBtFxzGBJpr',
+        durationSeconds: 1800
+    },
+    {
+        id: 'session-4',
         lessonSlug: 'dipole-rc',
-        title: 'Charge du condensateur',
-        videoUrl: 'https://www.youtube.com/watch?v=C-y70Z0v_sY',
-        durationSeconds: 1100
+        title: 'Session 1: Analyse du Dipôle RC',
+        videoUrl: 'https://www.youtube.com/embed/kM8K0a0KxIw?si=Y8wRceBtFxzGBJpr',
+        durationSeconds: 1800
+    },
+    {
+        id: 'session-5',
+        lessonSlug: 'cinetique-chimique',
+        title: 'Session 1: Bases de la Cinétique Chimique',
+        videoUrl: 'https://www.youtube.com/embed/kM8K0a0KxIw?si=Y8wRceBtFxzGBJpr',
+        durationSeconds: 1800
     },
 ];
 
