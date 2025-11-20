@@ -1,3 +1,4 @@
+
 'use server';
 
 import { z } from 'zod';
@@ -6,7 +7,7 @@ import { doc, setDoc, addDoc, collection, serverTimestamp, writeBatch } from 'fi
 import { auth, db } from '@/firebase/config';
 import { redirect } from 'next/navigation';
 import { aiSubjectAssistant } from '@/ai/flows/ai-subject-assistant';
-import { levels, classYears, subjects, lessons, recordedSessions, exercises } from '@/lib/data';
+import { recordedSessions, exercises } from '@/lib/data';
 
 const SignUpSchema = z
   .object({
@@ -149,7 +150,7 @@ export async function logTimeSpent(formData: FormData) {
 }
 
 async function seedCollection<T extends { id: string }>(collectionName: string, data: T[], batch: any) {
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     console.log(`No data to seed for ${collectionName}.`);
     return;
   }
@@ -171,16 +172,12 @@ export async function seedDatabase() {
     const batch = writeBatch(db);
 
     try {
-        await seedCollection('levels', levels, batch);
-        await seedCollection('classYears', classYears, batch);
-        await seedCollection('subjects', subjects, batch);
-        await seedCollection('lessons', lessons, batch);
         await seedCollection('recordedSessions', recordedSessions, batch);
         await seedCollection('exercises', exercises, batch);
 
         await batch.commit();
-        console.log('\n🎉 Database seeding completed successfully!');
-        return { success: true, message: 'Database seeded successfully!' };
+        console.log('\n🎉 Recorded sessions and exercises seeding completed successfully!');
+        return { success: true, message: 'Recorded sessions and exercises seeded successfully!' };
     } catch (error) {
         console.error('❌ Error seeding database:', error);
         return { success: false, message: `Error seeding database: ${error}` };
