@@ -2,12 +2,11 @@
 'use server';
 
 import { z } from 'zod';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, addDoc, collection, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { createUserWithEmailAndPassword, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import { doc, setDoc, addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/firebase/config';
 import { redirect } from 'next/navigation';
 import { aiSubjectAssistant } from '@/ai/flows/ai-subject-assistant';
-import { recordedSessions, exercises } from '@/lib/data';
 
 const SignUpSchema = z
   .object({
@@ -119,67 +118,116 @@ export async function askQuestion(prevState: AIAssistantFormState, formData: For
     }
 }
 
-const LogTimeSpentSchema = z.object({
-  userId: z.string(),
-  durationSeconds: z.number().int().positive(),
-  context: z.string(),
+// --- Profile Update Actions ---
+
+const UserProfileSchema = z.object({
+  firstName: z.string().min(1, { message: "Le prénom est requis" }),
+  lastName: z.string().min(1, { message: "Le nom est requis" }),
+  avatarUrl: z.string().url({ message: "L'URL de l'avatar n'est pas valide" }).optional().or(z.literal('')),
 });
 
-export async function logTimeSpent(formData: FormData) {
-  const validatedFields = LogTimeSpentSchema.safeParse(
+export interface UserProfileFormState {
+  success: boolean;
+  message: string;
+  errors?: {
+    firstName?: string[];
+    lastName?: string[];
+    avatarUrl?: string[];
+    _form?: string[];
+  };
+}
+
+
+export async function updateUserProfile(userId: string, prevState: UserProfileFormState, formData: FormData): Promise<UserProfileFormState> {
+  if (!userId) {
+    return { success: false, message: "Utilisateur non authentifié." };
+  }
+
+  const validatedFields = UserProfileSchema.safeParse(
     Object.fromEntries(formData.entries())
   );
-  
-  if (!validatedFields.success) {
-    console.error("Invalid time spent data:", validatedFields.error.flatten().fieldErrors);
-    return;
-  }
 
-  const { userId, durationSeconds, context } = validatedFields.data;
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      message: 'La validation a échoué.',
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+  
+  const { firstName, lastName, avatarUrl } = validatedFields.data;
 
   try {
-    await addDoc(collection(db, 'userTimeSpents'), {
-      userId,
-      durationSeconds,
-      context,
-      loggedAt: serverTimestamp(),
-    });
-  } catch (error) {
-    console.error("Error logging time spent:", error);
-  }
-}
-
-async function seedCollection<T extends { id: string }>(collectionName: string, data: T[], batch: any) {
-  if (!data || data.length === 0) {
-    console.log(`No data to seed for ${collectionName}.`);
-    return;
-  }
-  
-  const collectionRef = collection(db, collectionName);
-  
-  console.log(`Preparing batch for ${collectionName}...`);
-  
-  data.forEach((item) => {
-    const docRef = doc(collectionRef, item.id);
-    batch.set(docRef, item);
-  });
-  
-  console.log(`Batch for ${collectionName} prepared with ${data.length} documents.`);
-}
-
-export async function seedDatabase() {
-    console.log('Starting database seed process from server action...');
-    const batch = writeBatch(db);
-
-    try {
-        await seedCollection('recordedSessions', recordedSessions, batch);
-        await seedCollection('exercises', exercises, batch);
-
-        await batch.commit();
-        console.log('\n🎉 Recorded sessions and exercises seeding completed successfully!');
-        return { success: true, message: 'Recorded sessions and exercises seeded successfully!' };
-    } catch (error) {
-        console.error('❌ Error seeding database:', error);
-        return { success: false, message: `Error seeding database: ${error}` };
+    const userDocRef = doc(db, 'users', userId);
+    const updateData: any = { firstName, lastName };
+    if (avatarUrl) {
+      updateData.avatarUrl = avatarUrl;
     }
+    
+    await updateDoc(userDocRef, updateData);
+
+    return { success: true, message: 'Profil mis à jour avec succès!' };
+  } catch (error) {
+    return { success: false, message: `Une erreur est survenue: ${error}` };
+  }
+}
+
+const ChangePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, { message: 'Le mot de passe actuel est requis' }),
+    newPassword: z.string().min(6, { message: 'Le nouveau mot de passe doit contenir au moins 6 caractères' }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Les nouveaux mots de passe ne correspondent pas',
+    path: ['confirmPassword'],
+  });
+
+export interface ChangePasswordFormState {
+    success: boolean;
+    message: string;
+    errors?: {
+        currentPassword?: string[];
+        newPassword?: string[];
+        confirmPassword?: string[];
+        _form?: string[];
+    };
+}
+
+export async function changePassword(prevState: ChangePasswordFormState, formData: FormData): Promise<ChangePasswordFormState> {
+  const user = auth.currentUser;
+  if (!user || !user.email) {
+    return { success: false, message: "Utilisateur non authentifié." };
+  }
+
+  const validatedFields = ChangePasswordSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
+
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      message: 'La validation a échoué.',
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+  
+  const { currentPassword, newPassword } = validatedFields.data;
+  
+  try {
+    const credential = EmailAuthProvider.credential(user.email, currentPassword);
+    await reauthenticateWithCredential(user, credential);
+    await updatePassword(user, newPassword);
+    
+    return { success: true, message: 'Mot de passe changé avec succès!' };
+  } catch (error: any) {
+    if (error.code === 'auth/invalid-credential') {
+        return { 
+            success: false, 
+            message: "Le mot de passe actuel est incorrect.",
+            errors: { _form: ["Le mot de passe actuel est incorrect."] }
+        };
+    }
+    return { success: false, message: `Une erreur est survenue: ${error}` };
+  }
 }

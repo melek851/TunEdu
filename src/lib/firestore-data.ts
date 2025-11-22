@@ -1,5 +1,5 @@
 
-import { collection, getDocs, doc, getDoc, query, where, orderBy, Timestamp, collectionGroup, getCountFromServer, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, query, where, orderBy, Timestamp, collectionGroup, getCountFromServer, addDoc, serverTimestamp, limit } from 'firebase/firestore';
 import { db } from '@/firebase/config';
 import type { Level, ClassYear, Subject, Lesson, RecordedSession, Exercise, Comment, User, DashboardStats } from './types';
 import { unstable_noStore as noStore } from 'next/cache';
@@ -290,5 +290,53 @@ export async function getUserDashboardStats(userId: string): Promise<DashboardSt
     } catch (error) {
         console.error(`Error fetching dashboard stats for user ${userId}: `, error);
         return defaultStats;
+    }
+}
+
+export async function getRecentSubjects(userId: string, count: number): Promise<Subject[]> {
+    noStore();
+    if (!userId) return [];
+  
+    try {
+      // 1. Get recent lesson views for the user, ordered by most recent
+      const viewsQuery = query(
+        collection(db, 'userLessonViews'),
+        where('userId', '==', userId),
+        orderBy('viewedAt', 'desc'),
+        limit(20) // Get more than needed to account for multiple views of same subject
+      );
+      const viewsSnapshot = await getDocs(viewsQuery);
+      const recentLessonSlugs = viewsSnapshot.docs.map(doc => doc.data().lessonSlug);
+  
+      if (recentLessonSlugs.length === 0) return [];
+  
+      // 2. Get the lessons for those slugs
+      const lessonsQuery = query(collection(db, 'lessons'), where('slug', 'in', recentLessonSlugs));
+      const lessonsSnapshot = await getDocs(lessonsQuery);
+      const lessons = lessonsSnapshot.docs.map(doc => doc.data() as Lesson);
+  
+      // Create a map for quick lookup
+      const lessonMap = new Map(lessons.map(l => [l.slug, l]));
+  
+      // 3. Get the unique subject slugs from the lessons, maintaining recent order
+      const uniqueSubjectSlugs = recentLessonSlugs
+        .map(lessonSlug => lessonMap.get(lessonSlug)?.subjectSlug)
+        .filter((slug, index, self) => slug && self.indexOf(slug) === index) as string[];
+      
+      const finalSubjectSlugs = uniqueSubjectSlugs.slice(0, count);
+
+      if (finalSubjectSlugs.length === 0) return [];
+
+      // 4. Fetch the actual subject documents
+      const subjectsQuery = query(collection(db, 'subjects'), where('slug', 'in', finalSubjectSlugs));
+      const subjectsSnapshot = await getDocs(subjectsQuery);
+      const subjectMap = new Map(subjectsSnapshot.docs.map(doc => [doc.data().slug, doc.data() as Subject]));
+        
+      // 5. Return subjects in the correct recent order
+      return finalSubjectSlugs.map(slug => subjectMap.get(slug)).filter(Boolean) as Subject[];
+  
+    } catch (error) {
+      console.error(`Error fetching recent subjects for user ${userId}: `, error);
+      return [];
     }
 }

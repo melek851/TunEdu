@@ -6,7 +6,6 @@ import {
   LogOut,
   User as UserIcon,
   LayoutDashboard,
-  Loader2,
 } from "lucide-react"
 import { useUser } from "@/firebase/auth/use-user"
 import { signOut } from 'firebase/auth'
@@ -91,10 +90,12 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <UserIcon className="mr-2 h-4 w-4" />
-            <span>Profil</span>
-          </DropdownMenuItem>
+          <Link href="/profile">
+              <DropdownMenuItem>
+                <UserIcon className="mr-2 h-4 w-4" />
+                <span>Profil</span>
+              </DropdownMenuItem>
+          </Link>
           <DropdownMenuItem disabled>
             <LayoutDashboard className="mr-2 h-4 w-4" />
             <span>Admin Studio</span>

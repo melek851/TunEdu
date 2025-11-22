@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { getAllSubjects, getUserDashboardStats } from '@/lib/firestore-data';
+import { getUserDashboardStats, getRecentSubjects } from '@/lib/firestore-data';
 import Image from 'next/image';
 import { useUser } from '@/firebase/auth/use-user';
 import { useEffect, useState } from 'react';
@@ -47,14 +47,17 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
-      const fetchedSubjects = await getAllSubjects();
-      setSubjects(fetchedSubjects);
       if (user) {
-        const userStats = await getUserDashboardStats(user.uid);
+        const [userStats, recentSubjects] = await Promise.all([
+            getUserDashboardStats(user.uid),
+            getRecentSubjects(user.uid, 3)
+        ]);
         setStats(userStats);
+        setSubjects(recentSubjects);
       } else {
-        // If user logs out, clear the stats
+        // If user logs out, clear the stats and subjects
         setStats(null);
+        setSubjects([]);
       }
       setLoading(false);
     }
@@ -102,7 +105,7 @@ export default function DashboardPage() {
       <div>
         <h2 className="text-2xl font-bold font-headline mb-4">Continuer à apprendre</h2>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {(loading ? Array.from({ length: 3 }) : subjects.slice(0, 3)).map((subject, index) => (
+          {(loading ? Array.from({ length: 3 }) : subjects).map((subject, index) => (
             subject ? (
               <Card key={subject.id} className="overflow-hidden group">
                 <Link href={`/subjects/${subject.slug}`} className="block">
@@ -120,7 +123,7 @@ export default function DashboardPage() {
                   </CardHeader>
                   <CardContent>
                     <Button variant="ghost" className="w-full justify-between">
-                      Commencer
+                      Continuer
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </CardContent>
@@ -141,6 +144,21 @@ export default function DashboardPage() {
             )
           ))}
         </div>
+         {!loading && subjects.length === 0 && (
+          <Card className="flex flex-col items-center justify-center py-12 text-center">
+            <CardHeader>
+              <CardTitle>Commencez votre parcours d'apprentissage!</CardTitle>
+              <CardDescription>
+                Vous n'avez encore consulté aucune matière. Parcourez notre catalogue pour commencer.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild>
+                <Link href="/browse">Parcourir les matières</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
