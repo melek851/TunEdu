@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Pencil, Trash2, Video, FileText, ArrowLeft } from 'lucide-react';
-import { DeleteDialog } from '../../_components/delete-dialog';
+import { DeleteDialog } from '@/app/admin/_components/delete-dialog';
 import { deleteLesson } from '@/app/actions';
 import {
   Accordion,
