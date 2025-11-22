@@ -22,7 +22,7 @@ export default async function EditRecordedSessionPage({ params }: { params: { su
                 </Link>
             </Button>
             <h1 className="text-3xl font-bold font-headline mb-8">Modifier la Session Vidéo</h1>
-            <RecordedSessionForm lesson={lesson} session={session} />
+            <RecordedSessionForm lesson={lesson} session={session} subjectId={params.subjectId} />
         </div>
     );
 }

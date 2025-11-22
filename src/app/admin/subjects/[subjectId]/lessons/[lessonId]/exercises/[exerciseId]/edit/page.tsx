@@ -22,7 +22,7 @@ export default async function EditExercisePage({ params }: { params: { subjectId
                 </Link>
             </Button>
             <h1 className="text-3xl font-bold font-headline mb-8">Modifier l'Exercice</h1>
-            <ExerciseForm lesson={lesson} exercise={exercise} />
+            <ExerciseForm lesson={lesson} exercise={exercise} subjectId={params.subjectId} />
         </div>
     );
 }

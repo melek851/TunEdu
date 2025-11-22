@@ -28,10 +28,11 @@ function SubmitButton({ isEditing }: { isEditing: boolean }) {
 
 type ExerciseFormProps = {
     lesson: Lesson;
+    subjectId: string;
     exercise?: Exercise;
 };
 
-export function ExerciseForm({ lesson, exercise }: ExerciseFormProps) {
+export function ExerciseForm({ lesson, exercise, subjectId }: ExerciseFormProps) {
     const router = useRouter();
     const initialState: ExerciseFormState = { success: false, message: '' };
     const saveExerciseWithId = saveExercise.bind(null, exercise?.id || null);
@@ -40,11 +41,11 @@ export function ExerciseForm({ lesson, exercise }: ExerciseFormProps) {
     useEffect(() => {
         if (state.success) {
             toast({ title: 'Succès!', description: state.message });
-            router.push(`/admin/subjects/${lesson.subjectSlug}/lessons`);
+            router.push(`/admin/subjects/${subjectId}/lessons`);
         } else if (state.message && !state.success) {
             toast({ title: 'Erreur', description: state.message, variant: 'destructive' });
         }
-    }, [state, router, lesson.subjectSlug]);
+    }, [state, router, subjectId]);
 
     return (
         <Card className="max-w-2xl mx-auto">
@@ -91,7 +92,7 @@ export function ExerciseForm({ lesson, exercise }: ExerciseFormProps) {
 
                     <div className="flex justify-end gap-4">
                         <Button variant="ghost" asChild>
-                            <Link href={`/admin/subjects/${lesson.subjectSlug}/lessons`}>Annuler</Link>
+                            <Link href={`/admin/subjects/${subjectId}/lessons`}>Annuler</Link>
                         </Button>
                         <SubmitButton isEditing={!!exercise} />
                     </div>

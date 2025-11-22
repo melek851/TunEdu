@@ -21,7 +21,7 @@ export default async function NewExercisePage({ params }: { params: { subjectId:
                 </Link>
             </Button>
             <h1 className="text-3xl font-bold font-headline mb-8">Ajouter un Exercice à "{lesson.title}"</h1>
-            <ExerciseForm lesson={lesson} />
+            <ExerciseForm lesson={lesson} subjectId={params.subjectId} />
         </div>
     );
 }

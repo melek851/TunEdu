@@ -26,10 +26,11 @@ function SubmitButton({ isEditing }: { isEditing: boolean }) {
 
 type RecordedSessionFormProps = {
     lesson: Lesson;
+    subjectId: string;
     session?: RecordedSession;
 };
 
-export function RecordedSessionForm({ lesson, session }: RecordedSessionFormProps) {
+export function RecordedSessionForm({ lesson, session, subjectId }: RecordedSessionFormProps) {
     const router = useRouter();
     const initialState: RecordedSessionFormState = { success: false, message: '' };
     const saveSessionWithId = saveRecordedSession.bind(null, session?.id || null);
@@ -38,11 +39,11 @@ export function RecordedSessionForm({ lesson, session }: RecordedSessionFormProp
     useEffect(() => {
         if (state.success) {
             toast({ title: 'Succès!', description: state.message });
-            router.push(`/admin/subjects/${lesson.subjectSlug}/lessons`);
+            router.push(`/admin/subjects/${subjectId}/lessons`);
         } else if (state.message && !state.success) {
             toast({ title: 'Erreur', description: state.message, variant: 'destructive' });
         }
-    }, [state, router, lesson.subjectSlug]);
+    }, [state, router, subjectId]);
 
     return (
         <Card className="max-w-2xl mx-auto">
@@ -74,7 +75,7 @@ export function RecordedSessionForm({ lesson, session }: RecordedSessionFormProp
 
                     <div className="flex justify-end gap-4">
                         <Button variant="ghost" asChild>
-                            <Link href={`/admin/subjects/${lesson.subjectSlug}/lessons`}>Annuler</Link>
+                            <Link href={`/admin/subjects/${subjectId}/lessons`}>Annuler</Link>
                         </Button>
                         <SubmitButton isEditing={!!session} />
                     </div>

@@ -21,7 +21,7 @@ export default async function NewRecordedSessionPage({ params }: { params: { sub
                 </Link>
             </Button>
             <h1 className="text-3xl font-bold font-headline mb-8">Ajouter une Session à "{lesson.title}"</h1>
-            <RecordedSessionForm lesson={lesson} />
+            <RecordedSessionForm lesson={lesson} subjectId={params.subjectId} />
         </div>
     );
 }
