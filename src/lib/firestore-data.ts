@@ -157,6 +157,22 @@ export async function getLessonBySlug(slug: string): Promise<Lesson | null> {
     }
 }
 
+export async function getLessonById(id: string): Promise<Lesson | null> {
+    noStore();
+    if (!id) return null;
+    try {
+        const docRef = doc(db, 'lessons', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data() as Lesson;
+        }
+        return null;
+    } catch (error) {
+        console.error(`Error fetching lesson by id ${id}: `, error);
+        return null;
+    }
+}
+
 
 export async function getRecordedSessionsByLesson(lessonSlug: string): Promise<RecordedSession[]> {
     noStore();

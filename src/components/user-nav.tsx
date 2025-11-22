@@ -10,6 +10,7 @@ import {
 import { useUser } from "@/firebase/auth/use-user"
 import { signOut } from 'firebase/auth'
 import { auth } from '@/firebase/config'
+import { useRouter } from "next/navigation"
 
 import {
   DropdownMenu,
@@ -32,6 +33,7 @@ export function UserNav() {
   const { user, loading } = useUser();
   const [profile, setProfile] = useState<User | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchProfile() {
@@ -48,8 +50,9 @@ export function UserNav() {
     fetchProfile();
   }, [user]);
 
-  const handleSignOut = () => {
-    signOut(auth);
+  const handleSignOut = async () => {
+    await signOut(auth);
+    router.push('/auth/login');
   };
 
   if (loading || profileLoading) {

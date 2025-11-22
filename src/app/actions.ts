@@ -252,15 +252,7 @@ const SubjectSchema = z.object({
 export interface SubjectFormState {
   success: boolean;
   message: string;
-  errors?: {
-    name?: string[];
-    slug?: string[];
-    description?: string[];
-    classYearSlug?: string[];
-    manualUrl?: string[];
-    thumbnailUrl?: string[];
-    thumbnailHint?: string[];
-  };
+  errors?: z.ZodError<z.infer<typeof SubjectSchema>>['formErrors']['fieldErrors'];
 }
 
 export async function saveSubject(
@@ -284,19 +276,18 @@ export async function saveSubject(
   const data = validatedFields.data;
 
   try {
+    let id = subjectId;
     if (subjectId) {
-      // Update existing subject
       const subjectRef = doc(db, 'subjects', subjectId);
       await updateDoc(subjectRef, data);
     } else {
-      // Create new subject
-      const id = doc(collection(db, 'subjects')).id;
+      id = doc(collection(db, 'subjects')).id;
       const subjectRef = doc(db, 'subjects', id);
       await setDoc(subjectRef, { ...data, id });
     }
 
     revalidatePath('/admin');
-    revalidatePath(`/browse/${data.classYearSlug.split('-')[0]}}/${data.classYearSlug}`);
+    revalidatePath(`/browse/${data.classYearSlug.split('-')[0]}/${data.classYearSlug}`);
 
     return { success: true, message: `Matière ${subjectId ? 'mise à jour' : 'créée'} avec succès!` };
   } catch (error) {
@@ -306,10 +297,77 @@ export async function saveSubject(
 
 export async function deleteSubject(subjectId: string): Promise<{ success: boolean; message: string }> {
   try {
+    // This is a simplified delete. A real app would also delete all related
+    // lessons, sessions, exercises, comments, etc.
     await deleteDoc(doc(db, 'subjects', subjectId));
     revalidatePath('/admin');
     return { success: true, message: 'Matière supprimée avec succès.' };
   } catch (error) {
     return { success: false, message: `Une erreur est survenue lors de la suppression: ${error}` };
+  }
+}
+
+const LessonSchema = z.object({
+  title: z.string().min(1, "Le titre est requis"),
+  slug: z.string().min(1, "Le slug est requis").regex(/^[a-z0-9-]+$/, "Le slug ne peut contenir que des lettres minuscules, des chiffres et des tirets."),
+  subjectSlug: z.string(),
+  summary: z.string().min(1, "Le résumé est requis"),
+  order: z.coerce.number().min(1, "L'ordre doit être un nombre positif"),
+  score: z.coerce.number().min(0, "Le score ne peut pas être négatif"),
+});
+
+export interface LessonFormState {
+  success: boolean;
+  message: string;
+  errors?: z.ZodError<z.infer<typeof LessonSchema>>['formErrors']['fieldErrors'];
+}
+
+export async function saveLesson(
+    lessonId: string | null,
+    prevState: LessonFormState,
+    formData: FormData
+): Promise<LessonFormState> {
+
+    const validatedFields = LessonSchema.safeParse(
+        Object.fromEntries(formData.entries())
+    );
+
+    if (!validatedFields.success) {
+        return {
+            success: false,
+            message: 'La validation a échoué.',
+            errors: validatedFields.error.flatten().fieldErrors,
+        };
+    }
+    
+    const data = validatedFields.data;
+
+    try {
+        let id = lessonId;
+        if (lessonId) {
+            const lessonRef = doc(db, 'lessons', lessonId);
+            await updateDoc(lessonRef, data);
+        } else {
+            id = doc(collection(db, 'lessons')).id;
+            const lessonRef = doc(db, 'lessons', id);
+            await setDoc(lessonRef, { ...data, id });
+        }
+        revalidatePath(`/admin/subjects/${data.subjectSlug}/lessons`);
+        revalidatePath(`/subjects/${data.subjectSlug}`);
+        return { success: true, message: `Leçon ${lessonId ? 'mise à jour' : 'créée'} avec succès!` };
+    } catch (error) {
+        return { success: false, message: `Une erreur est survenue: ${error}` };
+    }
+}
+
+export async function deleteLesson(lessonId: string): Promise<{ success: boolean; message: string }> {
+  try {
+    await deleteDoc(doc(db, 'lessons', lessonId));
+    revalidatePath('/admin');
+    // We don't know the subject slug, so we can't revalidate the subject page specifically.
+    // A more complex implementation might pass it along.
+    return { success: true, message: 'Leçon supprimée avec succès.' };
+  } catch (error) {
+    return { success: false, message: `Une erreur est survenue: ${error}` };
   }
 }
