@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Pencil, Trash2, Video, FileText, ArrowLeft } from 'lucide-react';
 import { DeleteDialog } from '@/app/admin/_components/delete-dialog';
-import { deleteLesson } from '@/app/actions';
+import { deleteLesson, deleteRecordedSession, deleteExercise } from '@/app/actions';
 import {
   Accordion,
   AccordionContent,
@@ -73,7 +73,7 @@ export default async function AdminLessonsPage({ params }: { params: { subjectId
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <Card>
-                                                <CardHeader className="flex-row items-center justify-between">
+                                                <CardHeader className="flex-row items-center justify-between p-4">
                                                     <CardTitle className="text-base font-medium">Sessions Vidéo</CardTitle>
                                                     <Button asChild variant="outline" size="sm">
                                                          <Link href={`/admin/subjects/${subject.id}/lessons/${lesson.id}/sessions/new`}>
@@ -81,7 +81,7 @@ export default async function AdminLessonsPage({ params }: { params: { subjectId
                                                          </Link>
                                                     </Button>
                                                 </CardHeader>
-                                                <CardContent className="space-y-2">
+                                                <CardContent className="space-y-2 p-4 pt-0">
                                                     {sessions.map(s => (
                                                         <div key={s.id} className="flex justify-between items-center text-sm p-2 rounded-md bg-background">
                                                             <span>{s.title}</span>
@@ -89,7 +89,7 @@ export default async function AdminLessonsPage({ params }: { params: { subjectId
                                                                 <Button asChild size="icon" variant="ghost" className="h-7 w-7">
                                                                     <Link href={`/admin/subjects/${subject.id}/lessons/${lesson.id}/sessions/${s.id}/edit`}><Pencil className="h-4 w-4"/></Link>
                                                                 </Button>
-                                                                {/* <DeleteDialog id={s.id} action={deleteRecordedSession} itemName={s.title} /> */}
+                                                                <DeleteDialog id={s.id} action={deleteRecordedSession} itemName={s.title} />
                                                             </div>
                                                         </div>
                                                     ))}
@@ -97,7 +97,7 @@ export default async function AdminLessonsPage({ params }: { params: { subjectId
                                                 </CardContent>
                                             </Card>
                                              <Card>
-                                                <CardHeader className="flex-row items-center justify-between">
+                                                <CardHeader className="flex-row items-center justify-between p-4">
                                                     <CardTitle className="text-base font-medium">Exercices</CardTitle>
                                                     <Button asChild variant="outline" size="sm">
                                                          <Link href={`/admin/subjects/${subject.id}/lessons/${lesson.id}/exercises/new`}>
@@ -105,7 +105,7 @@ export default async function AdminLessonsPage({ params }: { params: { subjectId
                                                          </Link>
                                                     </Button>
                                                 </CardHeader>
-                                                <CardContent className="space-y-2">
+                                                <CardContent className="space-y-2 p-4 pt-0">
                                                     {exercises.map(ex => (
                                                         <div key={ex.id} className="flex justify-between items-center text-sm p-2 rounded-md bg-background">
                                                             <div className="flex items-center gap-2">
@@ -116,7 +116,7 @@ export default async function AdminLessonsPage({ params }: { params: { subjectId
                                                                 <Button asChild size="icon" variant="ghost" className="h-7 w-7">
                                                                     <Link href={`/admin/subjects/${subject.id}/lessons/${lesson.id}/exercises/${ex.id}/edit`}><Pencil className="h-4 w-4"/></Link>
                                                                 </Button>
-                                                                {/* <DeleteDialog id={ex.id} action={deleteExercise} itemName={ex.title} /> */}
+                                                                <DeleteDialog id={ex.id} action={deleteExercise} itemName={ex.title} />
                                                             </div>
                                                         </div>
                                                     ))}

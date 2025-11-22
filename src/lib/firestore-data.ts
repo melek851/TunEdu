@@ -186,6 +186,22 @@ export async function getRecordedSessionsByLesson(lessonSlug: string): Promise<R
     }
 }
 
+export async function getRecordedSessionById(id: string): Promise<RecordedSession | null> {
+    noStore();
+    if (!id) return null;
+    try {
+        const docRef = doc(db, 'recordedSessions', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data() as RecordedSession;
+        }
+        return null;
+    } catch (error) {
+        console.error(`Error fetching session by id ${id}: `, error);
+        return null;
+    }
+}
+
 export async function getExercisesByLesson(lessonSlug: string): Promise<Exercise[]> {
     noStore();
     try {
@@ -195,6 +211,22 @@ export async function getExercisesByLesson(lessonSlug: string): Promise<Exercise
     } catch (error) {
         console.error(`Error fetching exercises for lesson ${lessonSlug}: `, error);
         return [];
+    }
+}
+
+export async function getExerciseById(id: string): Promise<Exercise | null> {
+    noStore();
+    if (!id) return null;
+    try {
+        const docRef = doc(db, 'exercises', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data() as Exercise;
+        }
+        return null;
+    } catch (error) {
+        console.error(`Error fetching exercise by id ${id}: `, error);
+        return null;
     }
 }
 

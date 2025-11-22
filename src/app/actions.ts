@@ -371,3 +371,109 @@ export async function deleteLesson(lessonId: string): Promise<{ success: boolean
     return { success: false, message: `Une erreur est survenue: ${error}` };
   }
 }
+
+// --- Recorded Session Actions ---
+const RecordedSessionSchema = z.object({
+    title: z.string().min(1, "Le titre est requis"),
+    videoUrl: z.string().url("L'URL de la vidéo n'est pas valide"),
+    durationSeconds: z.coerce.number().min(1, "La durée doit être d'au moins 1 seconde"),
+    lessonSlug: z.string(),
+});
+
+export interface RecordedSessionFormState {
+  success: boolean;
+  message: string;
+  errors?: z.ZodError<z.infer<typeof RecordedSessionSchema>>['formErrors']['fieldErrors'];
+}
+
+export async function saveRecordedSession(
+    sessionId: string | null,
+    prevState: RecordedSessionFormState,
+    formData: FormData
+): Promise<RecordedSessionFormState> {
+    const validatedFields = RecordedSessionSchema.safeParse(Object.fromEntries(formData.entries()));
+
+    if (!validatedFields.success) {
+        return { success: false, message: 'La validation a échoué.', errors: validatedFields.error.flatten().fieldErrors };
+    }
+    
+    const data = validatedFields.data;
+    try {
+        let id = sessionId;
+        if (sessionId) {
+            await updateDoc(doc(db, 'recordedSessions', sessionId), data);
+        } else {
+            id = doc(collection(db, 'recordedSessions')).id;
+            await setDoc(doc(db, 'recordedSessions', id), { ...data, id });
+        }
+        revalidatePath(`/admin/subjects/.*/lessons`);
+        revalidatePath(`/lessons/${data.lessonSlug}`);
+        return { success: true, message: `Session ${sessionId ? 'mise à jour' : 'créée'} avec succès!` };
+    } catch (error) {
+        return { success: false, message: `Une erreur est survenue: ${error}` };
+    }
+}
+
+export async function deleteRecordedSession(sessionId: string): Promise<{ success: boolean; message: string }> {
+    try {
+        await deleteDoc(doc(db, 'recordedSessions', sessionId));
+        revalidatePath('/admin/.*', 'layout');
+        return { success: true, message: 'Session supprimée avec succès.' };
+    } catch (error) {
+        return { success: false, message: `Une erreur est survenue: ${error}` };
+    }
+}
+
+
+// --- Exercise Actions ---
+const ExerciseSchema = z.object({
+    title: z.string().min(1, "Le titre est requis"),
+    description: z.string().min(1, "La description est requise"),
+    fileUrl: z.string().url("L'URL du fichier n'est pas valide"),
+    difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']),
+    lessonSlug: z.string(),
+});
+
+export interface ExerciseFormState {
+  success: boolean;
+  message: string;
+  errors?: z.ZodError<z.infer<typeof ExerciseSchema>>['formErrors']['fieldErrors'];
+}
+
+export async function saveExercise(
+    exerciseId: string | null,
+    prevState: ExerciseFormState,
+    formData: FormData
+): Promise<ExerciseFormState> {
+    const validatedFields = ExerciseSchema.safeParse(Object.fromEntries(formData.entries()));
+
+    if (!validatedFields.success) {
+        return { success: false, message: 'La validation a échoué.', errors: validatedFields.error.flatten().fieldErrors };
+    }
+    
+    const data = validatedFields.data;
+    try {
+        let id = exerciseId;
+        if (exerciseId) {
+            await updateDoc(doc(db, 'exercises', exerciseId), data);
+        } else {
+            id = doc(collection(db, 'exercises')).id;
+            await setDoc(doc(db, 'exercises', id), { ...data, id });
+        }
+        revalidatePath(`/admin/subjects/.*/lessons`);
+        revalidatePath(`/lessons/${data.lessonSlug}`);
+        return { success: true, message: `Exercice ${exerciseId ? 'mis à jour' : 'créé'} avec succès!` };
+    } catch (error) {
+        return { success: false, message: `Une erreur est survenue: ${error}` };
+    }
+}
+
+export async function deleteExercise(exerciseId: string): Promise<{ success: boolean; message: string }> {
+    try {
+        await deleteDoc(doc(db, 'exercises', exerciseId));
+        revalidatePath('/admin/.*', 'layout');
+        return { success: true, message: 'Exercice supprimé avec succès.' };
+    } catch (error) {
+        return { success: false, message: `Une erreur est survenue: ${error}` };
+    }
+}
