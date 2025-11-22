@@ -1,7 +1,7 @@
 
 import { getSubjectById } from '@/lib/firestore-data';
 import { notFound } from 'next/navigation';
-import { LessonForm } from '../_components/lesson-form';
+import { LessonForm } from '@/app/admin/subjects/_components/lesson-form';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
