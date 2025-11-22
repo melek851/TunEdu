@@ -97,6 +97,23 @@ export async function getSubjectBySlug(slug: string): Promise<Subject | null> {
     }
 }
 
+export async function getSubjectById(id: string): Promise<Subject | null> {
+    noStore();
+    if (!id) return null;
+    try {
+        const docRef = doc(db, 'subjects', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return docSnap.data() as Subject;
+        }
+        return null;
+    } catch (error) {
+        console.error(`Error fetching subject by id ${id}: `, error);
+        return null;
+    }
+}
+
+
 export async function getAllSubjects(): Promise<Subject[]> {
   noStore();
   try {
@@ -314,7 +331,7 @@ export async function getRecentSubjects(userId: string, count: number): Promise<
       if (recentLessonSlugs.length === 0) return [];
   
       // 3. Get the lessons for those slugs
-      const lessonsQuery = query(collection(db, 'lessons'), where('slug', 'in', recentLessonSlugs));
+      const lessonsQuery = query(collection(db, 'lessons'), where('slug', 'in', recentLessonSlugs.slice(0, 20))); // Limit to avoid large 'in' queries
       const lessonsSnapshot = await getDocs(lessonsQuery);
       const lessons = lessonsSnapshot.docs.map(doc => doc.data() as Lesson);
   
@@ -343,5 +360,3 @@ export async function getRecentSubjects(userId: string, count: number): Promise<
       return [];
     }
 }
-
-    

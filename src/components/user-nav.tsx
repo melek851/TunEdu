@@ -96,10 +96,14 @@ export function UserNav() {
                 <span>Profil</span>
               </DropdownMenuItem>
           </Link>
-          <DropdownMenuItem disabled>
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            <span>Admin Studio</span>
-          </DropdownMenuItem>
+          {profile.role === 'ADMIN' && (
+            <Link href="/admin">
+              <DropdownMenuItem>
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                <span>Admin Studio</span>
+              </DropdownMenuItem>
+            </Link>
+          )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>

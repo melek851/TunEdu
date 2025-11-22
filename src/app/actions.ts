@@ -3,10 +3,12 @@
 
 import { z } from 'zod';
 import { createUserWithEmailAndPassword, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
-import { doc, setDoc, addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, addDoc, collection, serverTimestamp, updateDoc, writeBatch, deleteDoc } from 'firebase/firestore';
 import { auth, db } from '@/firebase/config';
 import { redirect } from 'next/navigation';
 import { aiSubjectAssistant } from '@/ai/flows/ai-subject-assistant';
+import { revalidatePath } from 'next/cache';
+import { recordedSessions, exercises } from '@/lib/data';
 
 const SignUpSchema = z
   .object({
@@ -165,6 +167,9 @@ export async function updateUserProfile(userId: string, prevState: UserProfileFo
     }
     
     await updateDoc(userDocRef, updateData);
+    revalidatePath('/profile');
+    revalidatePath('/');
+
 
     return { success: true, message: 'Profil mis à jour avec succès!' };
   } catch (error) {
@@ -229,5 +234,82 @@ export async function changePassword(prevState: ChangePasswordFormState, formDat
         };
     }
     return { success: false, message: `Une erreur est survenue: ${error}` };
+  }
+}
+
+// --- Admin Actions ---
+
+const SubjectSchema = z.object({
+  name: z.string().min(1, { message: "Le nom est requis" }),
+  slug: z.string().min(1, { message: "Le slug est requis" }).regex(/^[a-z0-9-]+$/, { message: "Le slug ne peut contenir que des lettres minuscules, des chiffres et des tirets." }),
+  description: z.string().min(1, { message: "La description est requise" }),
+  classYearSlug: z.string().min(1, { message: "L'année est requise" }),
+  manualUrl: z.string().url({ message: "L'URL du manuel n'est pas valide" }),
+  thumbnailUrl: z.string().url({ message: "L'URL de la miniature n'est pas valide" }),
+  thumbnailHint: z.string().min(1, { message: "L'indice de la miniature est requis" }),
+});
+
+export interface SubjectFormState {
+  success: boolean;
+  message: string;
+  errors?: {
+    name?: string[];
+    slug?: string[];
+    description?: string[];
+    classYearSlug?: string[];
+    manualUrl?: string[];
+    thumbnailUrl?: string[];
+    thumbnailHint?: string[];
+  };
+}
+
+export async function saveSubject(
+  subjectId: string | null,
+  prevState: SubjectFormState,
+  formData: FormData
+): Promise<SubjectFormState> {
+  
+  const validatedFields = SubjectSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
+
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      message: 'La validation a échoué.',
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  const data = validatedFields.data;
+
+  try {
+    if (subjectId) {
+      // Update existing subject
+      const subjectRef = doc(db, 'subjects', subjectId);
+      await updateDoc(subjectRef, data);
+    } else {
+      // Create new subject
+      const id = doc(collection(db, 'subjects')).id;
+      const subjectRef = doc(db, 'subjects', id);
+      await setDoc(subjectRef, { ...data, id });
+    }
+
+    revalidatePath('/admin');
+    revalidatePath(`/browse/${data.classYearSlug.split('-')[0]}}/${data.classYearSlug}`);
+
+    return { success: true, message: `Matière ${subjectId ? 'mise à jour' : 'créée'} avec succès!` };
+  } catch (error) {
+    return { success: false, message: `Une erreur est survenue: ${error}` };
+  }
+}
+
+export async function deleteSubject(subjectId: string): Promise<{ success: boolean; message: string }> {
+  try {
+    await deleteDoc(doc(db, 'subjects', subjectId));
+    revalidatePath('/admin');
+    return { success: true, message: 'Matière supprimée avec succès.' };
+  } catch (error) {
+    return { success: false, message: `Une erreur est survenue lors de la suppression: ${error}` };
   }
 }
