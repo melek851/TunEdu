@@ -298,19 +298,22 @@ export async function getRecentSubjects(userId: string, count: number): Promise<
     if (!userId) return [];
   
     try {
-      // 1. Get recent lesson views for the user, ordered by most recent
-      const viewsQuery = query(
-        collection(db, 'userLessonViews'),
-        where('userId', '==', userId),
-        orderBy('viewedAt', 'desc'),
-        limit(20) // Get more than needed to account for multiple views of same subject
-      );
+      // 1. Get all lesson views for the user.
+      const viewsQuery = query(collection(db, 'userLessonViews'), where('userId', '==', userId));
       const viewsSnapshot = await getDocs(viewsQuery);
-      const recentLessonSlugs = viewsSnapshot.docs.map(doc => doc.data().lessonSlug);
-  
+
+      if (viewsSnapshot.empty) return [];
+
+      // 2. Sort the views by date in memory (most recent first).
+      const sortedViews = viewsSnapshot.docs
+        .map(doc => doc.data() as { lessonSlug: string; viewedAt: Timestamp })
+        .sort((a, b) => b.viewedAt.toMillis() - a.viewedAt.toMillis());
+
+      const recentLessonSlugs = sortedViews.map(view => view.lessonSlug);
+
       if (recentLessonSlugs.length === 0) return [];
   
-      // 2. Get the lessons for those slugs
+      // 3. Get the lessons for those slugs
       const lessonsQuery = query(collection(db, 'lessons'), where('slug', 'in', recentLessonSlugs));
       const lessonsSnapshot = await getDocs(lessonsQuery);
       const lessons = lessonsSnapshot.docs.map(doc => doc.data() as Lesson);
@@ -318,7 +321,7 @@ export async function getRecentSubjects(userId: string, count: number): Promise<
       // Create a map for quick lookup
       const lessonMap = new Map(lessons.map(l => [l.slug, l]));
   
-      // 3. Get the unique subject slugs from the lessons, maintaining recent order
+      // 4. Get the unique subject slugs from the lessons, maintaining recent order
       const uniqueSubjectSlugs = recentLessonSlugs
         .map(lessonSlug => lessonMap.get(lessonSlug)?.subjectSlug)
         .filter((slug, index, self) => slug && self.indexOf(slug) === index) as string[];
@@ -327,12 +330,12 @@ export async function getRecentSubjects(userId: string, count: number): Promise<
 
       if (finalSubjectSlugs.length === 0) return [];
 
-      // 4. Fetch the actual subject documents
+      // 5. Fetch the actual subject documents
       const subjectsQuery = query(collection(db, 'subjects'), where('slug', 'in', finalSubjectSlugs));
       const subjectsSnapshot = await getDocs(subjectsQuery);
       const subjectMap = new Map(subjectsSnapshot.docs.map(doc => [doc.data().slug, doc.data() as Subject]));
         
-      // 5. Return subjects in the correct recent order
+      // 6. Return subjects in the correct recent order
       return finalSubjectSlugs.map(slug => subjectMap.get(slug)).filter(Boolean) as Subject[];
   
     } catch (error) {
@@ -340,3 +343,5 @@ export async function getRecentSubjects(userId: string, count: number): Promise<
       return [];
     }
 }
+
+    
