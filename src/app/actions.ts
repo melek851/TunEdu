@@ -3,12 +3,13 @@
 
 import { z } from 'zod';
 import { createUserWithEmailAndPassword, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
-import { doc, setDoc, addDoc, collection, serverTimestamp, updateDoc, writeBatch, deleteDoc } from 'firebase/firestore';
+import { doc, setDoc, addDoc, collection, serverTimestamp, updateDoc, writeBatch, deleteDoc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { auth, db } from '@/firebase/config';
 import { redirect } from 'next/navigation';
 import { aiSubjectAssistant } from '@/ai/flows/ai-subject-assistant';
 import { revalidatePath } from 'next/cache';
-import { recordedSessions, exercises } from '@/lib/data';
+import type { Lesson } from '@/lib/types';
+
 
 const SignUpSchema = z
   .object({
@@ -297,13 +298,46 @@ export async function saveSubject(
 
 export async function deleteSubject(subjectId: string): Promise<{ success: boolean; message: string }> {
   try {
-    // This is a simplified delete. A real app would also delete all related
-    // lessons, sessions, exercises, comments, etc.
-    await deleteDoc(doc(db, 'subjects', subjectId));
+    const batch = writeBatch(db);
+
+    const subjectRef = doc(db, 'subjects', subjectId);
+    const subjectDoc = await getDoc(subjectRef);
+    const subject = subjectDoc.data();
+
+    if (!subject) {
+      return { success: false, message: 'Matière non trouvée.' };
+    }
+
+    // 1. Find all lessons for the subject
+    const lessonsQuery = query(collection(db, 'lessons'), where('subjectSlug', '==', subject.slug));
+    const lessonsSnapshot = await getDocs(lessonsQuery);
+    
+    // 2. For each lesson, find and delete its sessions and exercises
+    for (const lessonDoc of lessonsSnapshot.docs) {
+      const lesson = lessonDoc.data() as Lesson;
+
+      // Delete recorded sessions
+      const sessionsQuery = query(collection(db, 'recordedSessions'), where('lessonSlug', '==', lesson.slug));
+      const sessionsSnapshot = await getDocs(sessionsQuery);
+      sessionsSnapshot.forEach(doc => batch.delete(doc.ref));
+
+      // Delete exercises
+      const exercisesQuery = query(collection(db, 'exercises'), where('lessonSlug', '==', lesson.slug));
+      const exercisesSnapshot = await getDocs(exercisesQuery);
+      exercisesSnapshot.forEach(doc => batch.delete(doc.ref));
+      
+      // Finally, delete the lesson itself
+      batch.delete(lessonDoc.ref);
+    }
+
+    // 3. Delete the subject itself
+    batch.delete(subjectRef);
+
+    await batch.commit();
     revalidatePath('/admin');
-    return { success: true, message: 'Matière supprimée avec succès.' };
-  } catch (error) {
-    return { success: false, message: `Une erreur est survenue lors de la suppression: ${error}` };
+    return { success: true, message: 'Matière et tout son contenu supprimés avec succès.' };
+  } catch (error: any) {
+    return { success: false, message: `Une erreur est survenue lors de la suppression: ${error.message}` };
   }
 }
 
@@ -362,13 +396,35 @@ export async function saveLesson(
 
 export async function deleteLesson(lessonId: string): Promise<{ success: boolean; message: string }> {
   try {
-    await deleteDoc(doc(db, 'lessons', lessonId));
+    const batch = writeBatch(db);
+
+    const lessonRef = doc(db, 'lessons', lessonId);
+    const lessonDoc = await getDoc(lessonRef);
+    const lesson = lessonDoc.data();
+
+    if (!lesson) {
+      return { success: false, message: 'Leçon non trouvée.' };
+    }
+
+    // 1. Find and delete all related recorded sessions
+    const sessionsQuery = query(collection(db, 'recordedSessions'), where('lessonSlug', '==', lesson.slug));
+    const sessionsSnapshot = await getDocs(sessionsQuery);
+    sessionsSnapshot.forEach(doc => batch.delete(doc.ref));
+
+    // 2. Find and delete all related exercises
+    const exercisesQuery = query(collection(db, 'exercises'), where('lessonSlug', '==', lesson.slug));
+    const exercisesSnapshot = await getDocs(exercisesQuery);
+    exercisesSnapshot.forEach(doc => batch.delete(doc.ref));
+
+    // 3. Delete the lesson itself
+    batch.delete(lessonRef);
+
+    await batch.commit();
+
     revalidatePath('/admin');
-    // We don't know the subject slug, so we can't revalidate the subject page specifically.
-    // A more complex implementation might pass it along.
-    return { success: true, message: 'Leçon supprimée avec succès.' };
-  } catch (error) {
-    return { success: false, message: `Une erreur est survenue: ${error}` };
+    return { success: true, message: 'Leçon, sessions et exercices supprimés avec succès.' };
+  } catch (error: any) {
+    return { success: false, message: `Une erreur est survenue lors de la suppression: ${error.message}` };
   }
 }
 
