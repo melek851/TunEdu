@@ -63,7 +63,7 @@ export function RecordedSessionForm({ lesson, session, subjectId }: RecordedSess
 
                      <div className="space-y-2">
                         <Label htmlFor="videoUrl">URL de la vidéo (YouTube)</Label>
-                        <Input id="videoUrl" name="videoUrl" defaultValue={session?.videoUrl} required placeholder="https://www.youtube.com/watch?v=..." />
+                        <Input id="videoUrl" name="videoUrl" type="text" defaultValue={session?.videoUrl} required placeholder="https://www.youtube.com/watch?v=..." />
                         {state.errors?.videoUrl && <p className="text-sm text-destructive">{state.errors.videoUrl[0]}</p>}
                     </div>
 
@@ -84,3 +84,5 @@ export function RecordedSessionForm({ lesson, session, subjectId }: RecordedSess
         </Card>
     );
 }
+
+    

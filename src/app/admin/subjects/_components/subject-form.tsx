@@ -91,13 +91,13 @@ export function SubjectForm({ subject, classYears, defaultYearSlug }: SubjectFor
 
                     <div className="space-y-2">
                         <Label htmlFor="manualUrl">URL du manuel (PDF)</Label>
-                        <Input id="manualUrl" name="manualUrl" type="url" defaultValue={subject?.manualUrl} required />
+                        <Input id="manualUrl" name="manualUrl" type="text" defaultValue={subject?.manualUrl} required />
                         {state.errors?.manualUrl && <p className="text-sm text-destructive">{state.errors.manualUrl[0]}</p>}
                     </div>
 
                      <div className="space-y-2">
                         <Label htmlFor="thumbnailUrl">URL de la miniature</Label>
-                        <Input id="thumbnailUrl" name="thumbnailUrl" type="url" defaultValue={subject?.thumbnailUrl} required />
+                        <Input id="thumbnailUrl" name="thumbnailUrl" type="text" defaultValue={subject?.thumbnailUrl} required />
                         {state.errors?.thumbnailUrl && <p className="text-sm text-destructive">{state.errors.thumbnailUrl[0]}</p>}
                     </div>
 
@@ -118,3 +118,5 @@ export function SubjectForm({ subject, classYears, defaultYearSlug }: SubjectFor
         </Card>
     );
 }
+
+    

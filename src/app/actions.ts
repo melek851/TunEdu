@@ -126,7 +126,7 @@ export async function askQuestion(prevState: AIAssistantFormState, formData: For
 const UserProfileSchema = z.object({
   firstName: z.string().min(1, { message: "Le prénom est requis" }),
   lastName: z.string().min(1, { message: "Le nom est requis" }),
-  avatarUrl: z.string().url({ message: "L'URL de l'avatar n'est pas valide" }).optional().or(z.literal('')),
+  avatarUrl: z.string().optional().or(z.literal('')),
 });
 
 export interface UserProfileFormState {
@@ -245,8 +245,8 @@ const SubjectSchema = z.object({
   slug: z.string().min(1, { message: "Le slug est requis" }).regex(/^[a-z0-9-]+$/, { message: "Le slug ne peut contenir que des lettres minuscules, des chiffres et des tirets." }),
   description: z.string().min(1, { message: "La description est requise" }),
   classYearSlug: z.string().min(1, { message: "L'année est requise" }),
-  manualUrl: z.string().url({ message: "L'URL du manuel n'est pas valide" }),
-  thumbnailUrl: z.string().url({ message: "L'URL de la miniature n'est pas valide" }),
+  manualUrl: z.string().min(1, { message: "L'URL du manuel est requise" }),
+  thumbnailUrl: z.string().min(1, { message: "L'URL de la miniature est requise" }),
   thumbnailHint: z.string().min(1, { message: "L'indice de la miniature est requis" }),
 });
 
@@ -431,7 +431,7 @@ export async function deleteLesson(lessonId: string): Promise<{ success: boolean
 // --- Recorded Session Actions ---
 const RecordedSessionSchema = z.object({
     title: z.string().min(1, "Le titre est requis"),
-    videoUrl: z.string().url("L'URL de la vidéo n'est pas valide"),
+    videoUrl: z.string().min(1, "L'URL de la vidéo est requise"),
     durationSeconds: z.coerce.number().min(1, "La durée doit être d'au moins 1 seconde"),
     lessonSlug: z.string(),
 });
@@ -485,7 +485,7 @@ export async function deleteRecordedSession(sessionId: string): Promise<{ succes
 const ExerciseSchema = z.object({
     title: z.string().min(1, "Le titre est requis"),
     description: z.string().min(1, "La description est requise"),
-    fileUrl: z.string().url("L'URL du fichier n'est pas valide"),
+    fileUrl: z.string().min(1, "L'URL du fichier est requise"),
     difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']),
     lessonSlug: z.string(),
 });
@@ -533,3 +533,5 @@ export async function deleteExercise(exerciseId: string): Promise<{ success: boo
         return { success: false, message: `Une erreur est survenue: ${error}` };
     }
 }
+
+    

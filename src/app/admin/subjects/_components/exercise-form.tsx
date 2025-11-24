@@ -71,7 +71,7 @@ export function ExerciseForm({ lesson, exercise, subjectId }: ExerciseFormProps)
 
                     <div className="space-y-2">
                         <Label htmlFor="fileUrl">URL du fichier (PDF)</Label>
-                        <Input id="fileUrl" name="fileUrl" type="url" defaultValue={exercise?.fileUrl} required />
+                        <Input id="fileUrl" name="fileUrl" type="text" defaultValue={exercise?.fileUrl} required />
                         {state.errors?.fileUrl && <p className="text-sm text-destructive">{state.errors.fileUrl[0]}</p>}
                     </div>
 
@@ -101,3 +101,5 @@ export function ExerciseForm({ lesson, exercise, subjectId }: ExerciseFormProps)
         </Card>
     );
 }
+
+    
