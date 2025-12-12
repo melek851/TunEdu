@@ -2,12 +2,6 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
-  experimental: {
-    turbopack: {
-      // This option is needed to make Next.js Turbopack resolve the Next.js package.
-      root: __dirname,
-    },
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
