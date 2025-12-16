@@ -3,8 +3,9 @@ import { getSubjectById, getClassYearsByLevel, getLevels } from '@/lib/firestore
 import { notFound } from 'next/navigation';
 import { SubjectForm } from '../../_components/subject-form';
 
-export default async function EditSubjectPage({ params }: { params: { subjectId: string } }) {
-    const subject = await getSubjectById(params.subjectId);
+export default async function EditSubjectPage({ params }: { params: Promise<{ subjectId: string }> }) {
+    const { subjectId } = await params;
+    const subject = await getSubjectById(subjectId);
     if (!subject) {
         notFound();
     }

@@ -7,8 +7,8 @@ import { Breadcrumbs } from '@/components/breadcrumbs';
 import type { BreadcrumbItem } from '@/lib/types';
 import { getLevelBySlug, getClassYearsByLevel } from '@/lib/firestore-data';
 
-export default async function BrowseYearsPage({ params }: { params: { levelSlug: string } }) {
-  const { levelSlug } = params;
+export default async function BrowseYearsPage({ params }: { params: Promise<{ levelSlug: string }> }) {
+  const { levelSlug } = await params;
   const level = await getLevelBySlug(levelSlug);
   
   if (!level) {

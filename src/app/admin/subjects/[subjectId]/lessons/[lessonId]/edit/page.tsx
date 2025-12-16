@@ -6,11 +6,12 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-export default async function EditLessonPage({ params }: { params: { subjectId: string, lessonId: string } }) {
-    const subject = await getSubjectById(params.subjectId);
+export default async function EditLessonPage({ params }: { params: Promise<{ subjectId: string, lessonId: string }> }) {
+    const { subjectId, lessonId } = await params;
+    const subject = await getSubjectById(subjectId);
     if (!subject) notFound();
 
-    const lesson = await getLessonById(params.lessonId);
+    const lesson = await getLessonById(lessonId);
     if (!lesson) notFound();
 
     return (

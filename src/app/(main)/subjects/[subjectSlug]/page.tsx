@@ -10,8 +10,8 @@ import { AiAssistant } from '@/components/ai-assistant';
 import type { BreadcrumbItem } from '@/lib/types';
 import { getSubjectBySlug, getLessonsBySubject, getClassYearBySlug, getLevelBySlug } from '@/lib/firestore-data';
 
-export default async function SubjectPage({ params }: { params: { subjectSlug: string } }) {
-  const { subjectSlug } = params;
+export default async function SubjectPage({ params }: { params: Promise<{ subjectSlug: string }> }) {
+  const { subjectSlug } = await params;
   const subject = await getSubjectBySlug(subjectSlug);
 
   if (!subject) {

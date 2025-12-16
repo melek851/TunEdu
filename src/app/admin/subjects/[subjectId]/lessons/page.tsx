@@ -16,8 +16,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 
 
-export default async function AdminLessonsPage({ params }: { params: { subjectId: string } }) {
-    const subject = await getSubjectById(params.subjectId);
+export default async function AdminLessonsPage({ params }: { params: Promise<{ subjectId: string }> }) {
+    const { subjectId } = await params;
+    const subject = await getSubjectById(subjectId);
     if (!subject) {
         notFound();
     }
